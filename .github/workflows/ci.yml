@@ -1,0 +1,59 @@
+name: CI
+
+# 274 test vardı ve hiçbiri otomatik koşmuyordu. Depoda tek bir iş var, çünkü
+# üç paket de aynı kurulumdan çıkıyor ve toplamı bir dakikanın altında —
+# ayırmak Actions dakikası harcamaktan başka bir işe yaramazdı.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Tip kontrolü, testler ve iki hedefin paketi
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # --frozen-lockfile: CI'da kilit dosyası SESSİZCE güncellenmesin.
+      # Güncellenirse yerelde geçen bir sürüm CI'da farklı bir sürümle koşar.
+      - name: Bağımlılıklar
+        run: pnpm install --frozen-lockfile
+
+      - name: Tip kontrolü
+        run: |
+          set -euo pipefail
+          for paket in shared extension backend; do
+            echo "--- $paket"
+            pnpm exec tsc --noEmit -p "$paket/tsconfig.json"
+          done
+
+      - name: Testler
+        run: pnpm -r test
+
+      # Paket testleri (extension/test/paket.test.ts) iki hedefi de derleyip
+      # manifest'i sınıyor, ama derlemenin kendisi ayrıca burada da koşuyor:
+      # bir derleme hatasının "test kırıldı" diye değil, "paket üretilemedi"
+      # diye görünmesi teşhisi hızlandırır.
+      - name: Paket — Chrome
+        working-directory: extension
+        run: node build.mjs
+
+      - name: Paket — Firefox
+        working-directory: extension
+        env:
+          HEDEF: firefox
+        run: node build.mjs

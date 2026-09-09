@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { handleMesaj, eskiDepoyuTemizle } from '../src/sw'
 
 const ilan: any = {
@@ -92,8 +92,21 @@ describe('analiz tamamen tarayıcıda', () => {
 
     expect(await handleMesaj(istek(), ile('{"error":{"message":"billing"}}', 429)))
       .toEqual({ ok: false, hata: 'anahtarSorunu' })
-    expect(await handleMesaj(istek(), ile('{"error":{"message":"rate limit"}}', 429)))
-      .toEqual({ ok: false, hata: 'hizLimiti' })
+
+    // Hız limitinde ikinci deneme 4 saniye BEKLİYOR (shared/src/analiz.ts).
+    // Beklemeyi gerçekten beklemek testi 4 saniye uzatıyordu; sahte zamanlayıcı
+    // aynı yolu geziyor ama saati biz ilerletiyoruz. Bekleme kaldırılmıyor:
+    // hız limitine takılmış bir isteği hemen tekrar sormak limiti daha da
+    // zorlar, yani o 4 saniye bilinçli bir davranış ve testi geçmeli.
+    vi.useFakeTimers()
+    try {
+      const sonuc = handleMesaj(istek(), ile('{"error":{"message":"rate limit"}}', 429))
+      await vi.advanceTimersByTimeAsync(4000)
+      expect(await sonuc).toEqual({ ok: false, hata: 'hizLimiti' })
+    } finally {
+      vi.useRealTimers()
+    }
+
     // JSON hiç ayrıştırılamazsa analiz üretilemedi
     expect(await handleMesaj(istek(), ile('bu json değil'))).toEqual({ ok: false, hata: 'ai' })
   })
