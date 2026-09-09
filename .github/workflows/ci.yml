@@ -67,9 +67,11 @@ jobs:
       # Tarayıcı indirmesi bu işin tek pahalı adımı (~20 sn). Ayrı bir iş
       # yapılmadı: kurulum ve derleme burada zaten var, ikinci kez yapmak
       # daha uzun sürerdi.
+      # `chromium` kanalı: uzantılar headless shell'de yüklenmiyor, tam
+      # Chromium derlemesi gerekiyor (bkz. e2e/uzanti.spec.ts açıklaması).
       - name: Chromium indir
         working-directory: extension
-        run: npx playwright install --with-deps chromium
+        run: npx playwright install --with-deps chromium chromium-headless-shell
 
       - name: Uçtan uca (uzantı yüklü Chromium)
         working-directory: extension

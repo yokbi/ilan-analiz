@@ -51,13 +51,16 @@ test.beforeAll(async () => {
   profil = mkdtempSync(join(tmpdir(), 'ilan-analiz-'))
   const dist = join(KOK, 'dist')
   context = await chromium.launchPersistentContext(profil, {
-    // Ortamda kurulu bir Chromium varsa o kullanılıyor; yoksa Playwright'ın
-    // kendi indirdiği. CI'da `npx playwright install chromium` koşuyor,
-    // geliştirici makinesinde de aynı komut yeter.
-    ...(process.env.CHROMIUM_YOLU ? { executablePath: process.env.CHROMIUM_YOLU } : {}),
-    // Uzantılar yalnızca kalıcı bağlamda ve yeni headless modunda yükleniyor.
+    // Uzantılar yalnızca kalıcı bağlamda ve TAM Chromium derlemesinde
+    // çalışıyor. Playwright'ın varsayılan headless'ı "headless shell" — o
+    // uzantı yüklemiyor ve hata da vermiyor: service worker hiç doğmuyor,
+    // test zaman aşımına düşüyor. `channel: 'chromium'` tam derlemeyi ve yeni
+    // headless modunu seçiyor. (Bu, testin CI'daki ilk koşusunda öğrenildi:
+    // yerelde tam ikili yolu verildiği için sorun görünmemişti.)
+    ...(process.env.CHROMIUM_YOLU
+      ? { executablePath: process.env.CHROMIUM_YOLU }
+      : { channel: 'chromium' }),
     args: [
-      '--headless=new',
       `--disable-extensions-except=${dist}`,
       `--load-extension=${dist}`,
     ],
