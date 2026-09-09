@@ -7,6 +7,20 @@ Diğer yarısı: [`TEST-HAZIRLIGI-YAPAMAYACAKLARIM.md`](TEST-HAZIRLIGI-YAPAMAYAC
 
 ---
 
+## Bu turda yapıldı (2026-09-09)
+
+| İş | Durum |
+|---|---|
+| **2.1 CI yok** | ✅ `.github/workflows/ci.yml` eklendi: tip kontrolü (üç paket), `pnpm -r test`, ve **iki hedefin de** paketlenmesi. Her push ve PR'da. |
+| **2.3 `sw.test.ts` 4,2 saniye sürüyor** | ✅ **4039 ms → 41 ms.** Sebep tahmin değildi: hız limitinde ikinci deneme `shared/src/analiz.ts:270`'te gerçekten 4 saniye bekliyor. Bekleme KALDIRILMADI — 429 almış bir isteği hemen tekrar sormak limiti daha da zorlar. Test artık sahte zamanlayıcıyla aynı yolu geziyor. |
+| **2.3 Sürüm göçü testi yok** | ✅ `lokalCache.ts` artık kayıt sürümü yazıyor ve okurken hem sürümü hem **şemayı** doğruluyor; uymayan kayıt yok sayılıp analiz yeniden üretiliyor. 8 test. |
+| **2.2 Firefox çıktısını doğrulamak** | ✅ Manifest şeması testle sabitlendi (`test/paket.test.ts`, 11 test): Firefox event page, Chrome service worker, gecko kimliği, veri toplama beyanı, izinlerin site kaydıyla birebirliği, ve derlenmiş çıktıda anahtara benzeyen dize olmaması. **"Firefox'ta çalışıyor" demek değil** — yüklenmesini engelleyen bilinen bir sorun kalmadı demek. |
+| **2.3 Uzantı düzeyinde uçtan uca test** | ⏳ **Hâlâ yok.** Playwright'ı `--load-extension` ile açmak yeni bir bağımlılık ve CI'da tarayıcı indirmesi demek; ayrı bir karar olarak bırakıldı. |
+
+Test sayısı **274 → 293** (`shared` 99, `extension` 191, `backend` 3).
+
+---
+
 ## 0. Platform durumu (ölçüldü)
 
 | Platform | Durum | Gerekçe |
@@ -42,10 +56,16 @@ iki farklı site için DOM ayrıştırma, hata kodları, ve "karşılaştırma y
 
 ## 2. Yapabileceğim işler
 
-### 2.1 En büyük boşluk: CI yok
+### 2.1 ✅ CI eklendi
+
+*(Bu madde 2026-09-09'da kapandı; aşağıdaki metin özgün hâli.)*
 
 Depoda `.github/` klasörü **hiç yok**. 274 test var ama hiçbiri otomatik
 koşmuyor. Workflow'u **diff olarak hazırlayabilirim** (uygulamak sizde).
+
+**Yapıldı:** `.github/workflows/ci.yml` — tek iş, üç paketin tip kontrolü,
+bütün testler ve iki hedefin paketi. Toplamı bir dakikanın altında. Actions
+dakikası harcıyor; sık koşan bir depoda bu bilinçli bir maliyet.
 
 ### 2.2 Firefox çıktısını doğrulamak
 

@@ -101,10 +101,14 @@ Chrome'daki kadar güvenilir taklit edilemez.
 
 ---
 
-## 7. CI dosyasını uygulamak
+## 7. ~~CI dosyasını uygulamak~~ — 2026-09-09'da yapıldı
 
-Depoda CI yok. Workflow'u diff olarak hazırlayabilirim ama dosyayı ekleyip
-koşu tetiklemek sizde — Actions dakikası sizin.
+Depoda CI yoktu. Bu madde "Actions dakikası sizin" gerekçesiyle sizde
+bırakılmıştı; açık izinle uygulandı: `.github/workflows/ci.yml`.
+
+Geriye kalan tek şey **maliyet kararı**: iş bir dakikanın altında ama her
+push'ta koşuyor. Fazla geldiyse `on:` bloğundan `push` çıkarılıp yalnız
+`pull_request` bırakılabilir.
 
 ---
 
