@@ -15,9 +15,9 @@ Diğer yarısı: [`TEST-HAZIRLIGI-YAPAMAYACAKLARIM.md`](TEST-HAZIRLIGI-YAPAMAYAC
 | **2.3 `sw.test.ts` 4,2 saniye sürüyor** | ✅ **4039 ms → 41 ms.** Sebep tahmin değildi: hız limitinde ikinci deneme `shared/src/analiz.ts:270`'te gerçekten 4 saniye bekliyor. Bekleme KALDIRILMADI — 429 almış bir isteği hemen tekrar sormak limiti daha da zorlar. Test artık sahte zamanlayıcıyla aynı yolu geziyor. |
 | **2.3 Sürüm göçü testi yok** | ✅ `lokalCache.ts` artık kayıt sürümü yazıyor ve okurken hem sürümü hem **şemayı** doğruluyor; uymayan kayıt yok sayılıp analiz yeniden üretiliyor. 8 test. |
 | **2.2 Firefox çıktısını doğrulamak** | ✅ Manifest şeması testle sabitlendi (`test/paket.test.ts`, 11 test): Firefox event page, Chrome service worker, gecko kimliği, veri toplama beyanı, izinlerin site kaydıyla birebirliği, ve derlenmiş çıktıda anahtara benzeyen dize olmaması. **"Firefox'ta çalışıyor" demek değil** — yüklenmesini engelleyen bilinen bir sorun kalmadı demek. |
-| **2.3 Uzantı düzeyinde uçtan uca test** | ⏳ **Hâlâ yok.** Playwright'ı `--load-extension` ile açmak yeni bir bağımlılık ve CI'da tarayıcı indirmesi demek; ayrı bir karar olarak bırakıldı. |
+| **2.3 Uzantı düzeyinde uçtan uca test** | ✅ Yazıldı: `extension/e2e/uzanti.spec.ts`, **4 test**, derlenmiş paket gerçek Chromium'a `--load-extension` ile yükleniyor. Kaydedilmiş ilan sayfası `route.fulfill` ile **gerçek adreste** sunuluyor — içerik script'i manifest desenine göre enjekte edildiği için `localhost` testi anlamsız kılardı. Maliyeti kabul edildi: `@playwright/test` devDependency ve CI'da ~20 sn tarayıcı indirmesi. |
 
-Test sayısı **274 → 293** (`shared` 99, `extension` 191, `backend` 3).
+Test sayısı **274 → 297** (293 birim + 4 uçtan uca) (`shared` 99, `extension` 191, `backend` 3).
 
 ---
 

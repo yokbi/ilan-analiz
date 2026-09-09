@@ -4,17 +4,19 @@
   "scripts": {
     "test": "vitest run",
     "build": "node build.mjs",
-    "paket": "PAKET=1 node build.mjs"
+    "paket": "PAKET=1 node build.mjs",
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "preact": "^10.24.0",
     "shared": "workspace:*"
   },
   "devDependencies": {
-    "typescript": "^5.5.0",
-    "vitest": "^3.0.0",
-    "happy-dom": "^15.0.0",
+    "@playwright/test": "^1.63.0",
+    "@types/chrome": "^0.0.280",
     "esbuild": "^0.24.0",
-    "@types/chrome": "^0.0.280"
+    "happy-dom": "^15.0.0",
+    "typescript": "^5.5.0",
+    "vitest": "^3.0.0"
   }
 }
