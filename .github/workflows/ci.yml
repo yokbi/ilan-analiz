@@ -57,3 +57,32 @@ jobs:
         env:
           HEDEF: firefox
         run: node build.mjs
+
+      # Uzantı düzeyinde uçtan uca: derlenmiş paket gerçek bir Chromium'a
+      # yükleniyor ve kaydedilmiş bir ilan sayfasında panel çiziliyor mu?
+      # Birim testleri bunu söyleyemiyor — manifest'teki bir yazım hatası
+      # ya da hiç enjekte edilmeyen bir içerik script'i onların hepsi yeşilken
+      # uzantıyı sessizce ölü bırakır.
+      #
+      # Tarayıcı indirmesi bu işin tek pahalı adımı (~20 sn). Ayrı bir iş
+      # yapılmadı: kurulum ve derleme burada zaten var, ikinci kez yapmak
+      # daha uzun sürerdi.
+      # `chromium` kanalı: uzantılar headless shell'de yüklenmiyor, tam
+      # Chromium derlemesi gerekiyor (bkz. e2e/uzanti.spec.ts açıklaması).
+      - name: Chromium indir
+        working-directory: extension
+        run: npx playwright install --with-deps chromium chromium-headless-shell
+
+      - name: Uçtan uca (uzantı yüklü Chromium)
+        working-directory: extension
+        env:
+          CI: 'true'
+        run: npm run test:e2e
+
+      - name: Uçtan uca raporu (yalnızca hata durumunda)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: extension/playwright-report/
+          retention-days: 7

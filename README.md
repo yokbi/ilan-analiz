@@ -145,6 +145,21 @@ Testler gerçek sayfa yapılarından çıkarılmış fixture'lara bakar
 (`extension/test/fixtures/`). Fixture'lardaki ilan numaraları, başlıklar ve satıcının
 yazdığı serbest metinler **sentetiktir**; yalnız DOM yapısı gerçektir.
 
+### Uçtan uca test (uzantı yüklü tarayıcı)
+
+Birim testleri parçaları doğruluyor; bu, derlenmiş paketin gerçek bir
+Chromium'a yüklendiğinde ilan sayfasında panel çizdiğini doğruluyor.
+
+```bash
+cd extension
+npx playwright install chromium   # ilk seferde
+npm run test:e2e
+```
+
+Sayfa ağdan çekilmiyor: kaydedilmiş fixture, isteği karşılayarak gerçek
+adreste sunuluyor. Adres önemli — içerik script'i manifest'teki eşleşme
+desenine göre enjekte ediliyor.
+
 ## Kapsam ve sorumluluk
 
 İlan Analiz bağımsız bir üründür; üzerinde çalıştığı ilan siteleriyle herhangi bir
