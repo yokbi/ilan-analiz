@@ -67,45 +67,66 @@ koşmuyor. Workflow'u **diff olarak hazırlayabilirim** (uygulamak sizde).
 bütün testler ve iki hedefin paketi. Toplamı bir dakikanın altında. Actions
 dakikası harcıyor; sık koşan bir depoda bu bilinçli bir maliyet.
 
-### 2.2 Firefox çıktısını doğrulamak
+### 2.2 ✅ Firefox çıktısı doğrulandı (2026-09-10)
 
-`build.mjs` Firefox için ayrı bir manifest üretiyor ama üretilen paketin
-gerçekten yüklenip yüklenmediği bilinmiyor. Yapabileceklerim:
+İkisi de yapıldı.
 
-- `HEDEF=firefox npm run build` çıktısını üretip **manifest'i şemaya göre
-  doğrulamak** (event page / service worker farkı doğru mu, izinler doğru mu).
-- Firefox'un `browser.*` ile Chrome'un `chrome.*` API farklarının kodda
-  gerçekten soyutlanıp soyutlanmadığını taramak.
-- Bu, "Firefox'ta çalışıyor" demek değil — "Firefox'ta yüklenmesini engelleyen
-  bilinen bir sorun kalmadı" demek. Gerisi diğer dosyada.
+**Manifest.** `HEDEF=firefox npm run build` koşuldu ve `dist-firefox/manifest.json`
+okundu:
 
-### 2.3 Test kapsamındaki gerçek boşluklar
+| Alan | Değer | Doğru mu |
+|---|---|---|
+| `manifest_version` | 3 | ✅ |
+| `background` | `{"scripts":["sw.js"],"type":"module"}` | ✅ event page — `service_worker` **yok** |
+| `permissions` | `["storage"]` | ✅ tek izin |
+| `host_permissions` | sahibinden, arabam, generativelanguage | ✅ üçü de gerekli |
 
-- **Uzantının bütün olarak yüklenip çalıştığını gösteren tek bir test yok.**
-  172 test var ama hepsi birim/DOM düzeyinde. Playwright, Chromium'u
-  `--load-extension` ile açabilir; kaydedilmiş bir ilan sayfası HTML'i üzerinde
-  content script'in gerçekten paneli bastığını uçtan uca test edebilirim.
-- **`sw.test.ts` 4.2 saniye sürüyor** — testlerin geri kalanının toplamından
-  uzun. Muhtemelen gerçek zaman aşımı bekliyor; sahte zamanlayıcıya çevirebilirim.
-- **Sürüm göçü (migration) testi yok.** Depolanan analizler 24 saat yaşıyor;
-  şema değişirse eski kayıtlarla ne olduğu test edilmiyor.
+Firefox MV3'te `service_worker` desteklenmiyor (`web-ext lint:
+MANIFEST_FIELD_UNSUPPORTED`); üretilen manifest bu tuzağa düşmüyor.
+
+**API soyutlaması.** `src/` altında `tarayici.ts` dışında **tek bir**
+`chrome.*` ya da `browser.*` erişimi yok — tarandı, çıktı boş. Bütün erişim o
+modülden geçiyor ve modülün kendisi dört vakayla testli (Firefox'ta `browser`,
+Chrome'da `chrome`, modül yüklendikten sonra kurulan ad alanı, ikisi de yokken
+çökmemek).
+
+> Bu hâlâ "Firefox'ta çalışıyor" demek **değil** — "Firefox'ta yüklenmesini
+> engelleyen bilinen bir sorun kalmadı" demek. Gerçek yükleme diğer dosyada.
+
+### 2.3 ✅ Test kapsamındaki boşluklar — üçü de kapandı (2026-09-10 kontrolü)
+
+Üç madde de artık geçersiz. Kodun kendisine ve testlerin çıktısına bakıldı:
+
+| Madde | Durum |
+|---|---|
+| Uzantının bütün olarak yüklendiğini gösteren test yok | **Var.** `e2e/uzanti.spec.ts` gerçek Chromium'u `--load-extension` ile açıyor; CI'da koşuyor |
+| `sw.test.ts` 4.2 saniye sürüyor | **26 ms.** Sahte zamanlayıcıya çevrildi (`vi.useFakeTimers` + `advanceTimersByTimeAsync`) |
+| Sürüm göçü testi yok | **Var.** `lokalCache.test.ts`: başka sürümden kalan kayıt, sürümsüz eski kayıt ve şemaya uymayan gövde — üçü de reddediliyor |
+
+Bütün paket: **191 test, 3.6 saniye.**
 
 ### 2.4 Site ayrıştırıcılarının dayanıklılığı
 
-`extension/src/siteler/` iki siteyi ayrıştırıyor. Bu kodun doğası gereği
-**site HTML'i değişince sessizce bozulur**. Yapabileceğim:
+Bu bölümün ikinci maddesi (*"ayrıştırma başarısız olduğunda sessiz kalmak
+yerine kullanıcıya söylemek"*) bir soru olarak yazılmıştı — *"varsa doğrulamak,
+yoksa eklemek"*. **Bakıldı: var.**
 
-- `extension/test/fixtures/` altındaki örnekleri genişletmek (eksik alan, boş
-  ilan, farklı düzen).
-- Ayrıştırma başarısız olduğunda **sessiz kalmak yerine** kullanıcıya "bu sayfayı
-  okuyamadım" demesini sağlayan bir yol varsa doğrulamak, yoksa eklemek.
+`content.tsx`'te ilan ya da fiyat okunamazsa panel `okunamadi` durumuna
+geçiyor ve ekrana *"İlan bilgileri okunamadı."* yazıyor; sessizce vazgeçmiyor.
+`panel.test.tsx` bu durumu ayrıca test ediyor.
+
+Açık kalan tek madde, fixture'ları genişletmek (eksik alan, boş ilan, farklı
+düzen). Bu, gerçek ilan sayfalarından örnek almayı gerektiriyor — o da diğer
+dosyada, çünkü bu ortamdan ilan sayfalarına çıkılamıyor.
 
 ### 2.5 Tasarım işleri
 
 - Panel Preact ile yazılmış. **Karanlık tema** var mı, kontrast yeterli mi —
   denetleyip düzeltebilirim.
-- Panelin ilan sayfasının içine girerken sitenin kendi CSS'iyle çakışıp
-  çakışmadığı (stil sızıntısı) — Shadow DOM kullanılmıyorsa gerçek bir risk.
+- ~~Panelin sitenin CSS'iyle çakışması (stil sızıntısı)~~ — **risk yok, bakıldı.**
+  `mountPanel` paneli `attachShadow({ mode: 'open' })` ile Shadow DOM içine
+  kuruyor ve stili gölge kökün içine enjekte ediyor. Maddenin kendi şartı
+  ("Shadow DOM kullanılmıyorsa") sağlanmıyor.
 - Popup (anahtar girişi) ekranının boş/hata/yükleniyor durumları.
 - Farklı zoom seviyelerinde ve dar pencerede panelin taşması.
 
