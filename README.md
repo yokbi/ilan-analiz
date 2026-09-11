@@ -133,6 +133,8 @@ cümleleridir.
 | `shared/` | Şemalar, deterministik hesaplar, PII maskesi, analiz hattı |
 | `backend/` | Yalnızca statik gizlilik politikası sayfası (130 satır). Analiz akışında yer almaz |
 
+Açık işler ve kimde oldukları: [YAPILACAKLAR.md](YAPILACAKLAR.md).
+
 ## Geliştirme
 
 ```bash
