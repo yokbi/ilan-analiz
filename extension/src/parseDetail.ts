@@ -7,7 +7,7 @@ export function parseDetail(doc: Document, url: string): ListingDetail | null {
 
   // DOM fallback: "İlan No" etiketli li'nin span'i (URL'de id yoksa kullanılır)
   const ilanNoLi = [...doc.querySelectorAll('ul.classifiedInfoList li')]
-    .find(li => li.querySelector('strong')?.textContent?.replace(/:$/, '').trim() === 'İlan No')
+    .find(li => metin(li.querySelector('strong'))?.replace(/\s*:$/, '') === 'İlan No')
     ?.querySelector('span')?.textContent?.trim()
 
   // URL'in SONUNDAKI uzun (≥5 haneli) rakam grubu — slug içindeki kısa rakamları eler
@@ -25,9 +25,11 @@ export function parseDetail(doc: Document, url: string): ListingDetail | null {
     il: null, ilce: null, aciklamaText: null, modelAramaPath: null, ustAramaPath: null, ekAlanlar: {}
   }
 
-  // Özellik listesi: her li'de strong=etiket, span=değer
+  // Özellik listesi: her li'de strong=etiket, span=değer.
+  // "KM :" gibi iki noktadan önce boşluklu etiket de tanınmalı; yoksa "KM " eşleşmez,
+  // km sessizce null kalır ve alan ekAlanlar'a düşer (fixture testi yakaladı).
   for (const li of doc.querySelectorAll('ul.classifiedInfoList li')) {
-    const etiket = metin(li.querySelector('strong'))?.replace(/:$/, '')
+    const etiket = metin(li.querySelector('strong'))?.replace(/\s*:$/, '')
     const deger = metin(li.querySelector('span'))
     if (!etiket || !deger) continue
     const alan = etiketAlani(etiket)

@@ -1,6 +1,6 @@
 # İlan Analiz — Yapılacaklar
 
-Son ölçüm: **2026-10-21** · Dal: `main` (`c2bb116`) + tek-alan testleri
+Son ölçüm: **2026-10-21** · Dal: `main` (`c2bb116`) + eksik/bozuk ilan testleri
 
 Bu dosya açık işlerin tek listesidir. Her madde ya **bende** (kod tarafı, bu
 depoda yapılabilir) ya **sizde** (hesap, anahtar, para veya hukuki karar
@@ -15,9 +15,9 @@ dosyalarındadır; burada yalnız **kalan iş** durur.
 
 | | |
 |---|---|
-| Test | **307 geçiyor / 0 kırık** — `shared` 99, `extension` 205, `backend` 3 |
-| Test dosyası | 24 |
-| Tek alan okunamadı | **Teste bağlı** — `extension/test/eksikAlan.test.ts`, iki adaptör |
+| Test | **322 geçiyor / 0 kırık** — `shared` 99, `extension` 220, `backend` 3 |
+| Test dosyası | 25 |
+| Eksik/bozuk ilan | **Teste bağlı** — `extension/test/eksikAlan.test.ts` (tek alan) ve `fixtureEksik.test.ts` (4 elle kurulmuş fixture: eksik, fiyatsız, farklı düzen, arabam eksik) |
 | Tip denetimi | Üç paket de temiz (`pnpm -r exec tsc --noEmit`) |
 | CI | **Var** — `.github/workflows/ci.yml`; tip, test, iki hedefin paketi ve uçtan uca koşuyor |
 | Uçtan uca | **Var** — `extension/e2e/uzanti.spec.ts`, uzantı yüklü gerçek Chromium |
@@ -37,14 +37,10 @@ pnpm -r exec tsc --noEmit
 
 ### 1.1 Ayrıştırıcı dayanıklılığı · öncelik: yüksek
 
-- [ ] Fixture'ları eksik/bozuk ilanlarla genişlet: fiyatı olmayan ilan, boş
-      açıklama, kilometre alanı hiç yazılmamış ilan, farklı düzendeki detay
-      sayfası. Bugünkü fixture'lar `extension/test/fixtures/` altında ve hepsi
-      **tam dolu** ilanlardan çıkarılmış.
-
-> Bu maddenin ön koşulu sizde: yeni fixture ancak gerçek bir ilan sayfasından
-> çıkarılabilir, bu ortamdan ilan sitelerine çıkılmıyor (deponun kendi kırmızı
-> çizgisi). Bir ilan sayfasının HTML'ini kaydedip verirseniz gerisi bende.
+Kod tarafında açık madde kalmadı. Eksik/bozuk ilan fixture'ları diğerleri gibi
+**elle kuruldu**; gerçek sitenin eksik ilanı nasıl gösterdiğini bilmiyoruz.
+2.2'deki canlı kontrolde eksik alanlı bir ilan görürseniz HTML'ini kaydedip
+verin, gerçek örnek olarak eklenir.
 
 ### 1.2 Arayüz · öncelik: orta
 
@@ -139,7 +135,7 @@ gerçek bir Firefox'ta açılmadı.**
 
 1. **2.1** — gerçek anahtarla deneme. Ürünün çalıştığının tek kanıtı bu.
 2. **2.2** — canlı sayfa doğrulaması. En sessiz kırılma noktası burası.
-3. **1.1** — fixture genişletme (2.2'den çıkacak örneklerle).
+3. **1.1** — 2.2'den çıkacak gerçek eksik ilan örneklerini fixture'a eklemek.
 4. **2.3** — Firefox yüklemesi.
 5. **1.2 / 1.3** — arayüz ve mağaza hazırlığı.
 6. **2.4 / 2.5** — yayın ve hukuk.
