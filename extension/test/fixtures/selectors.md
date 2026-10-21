@@ -59,3 +59,18 @@ En derin kırıntı **donanım** seviyesinde olabiliyor. Ölçülen örnek:
 `/ornek-marka-model` → N ilan (eşleşen M),
 bir üstü `/ornek-marka-model` → N ilan (eşleşen M). Bu yüzden
 `ustAramaPath` taşınıyor ve örneklem 5'in altındaysa oraya düşülüyor.
+
+## Eksik/bozuk ilan fixture'ları
+
+Hepsi elle kuruldu, gerçek ilandan değil. Testleri `test/fixtureEksik.test.ts`'te.
+
+| Dosya | Ne eksik/farklı | Beklenen |
+|---|---|---|
+| `detay-eksik.html` | KM ve İlan No satırı yok, yıl "Belirtilmemiş", açıklama boş, ilçe yok | İlan okunur, eksik alanlar `null`, id URL'den |
+| `detay-fiyatsiz.html` | Fiyatta rakam yok ("Fiyat sorunuz") | `null`, panel "okunamadı" |
+| `detay-farkli-duzen.html` | Karışık satır sırası, `KM :` / iki noktasız etiketler, iç içe `<a>`/`<span>` değerler, satır sonları | Tüm alanlar okunur |
+| `arabam-detay-eksik.html` | Fiyat, İlan No, tramer yok; km "-"; açıklama boş | İlan okunur, `fiyat: null`, panel "okunamadı" |
+
+`detay-farkli-duzen.html` bir hata yakaladı: `KM :` etiketi `KM ` olarak kalıyor,
+km `null` oluyor ve alan `ekAlanlar`'a düşüyordu. `parseDetail` artık iki noktadan
+önceki boşluğu da siliyor.
