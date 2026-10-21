@@ -1,6 +1,6 @@
 # İlan Analiz — Yapılacaklar
 
-Son ölçüm: **2026-09-11** · Dal: `main` (`b0a8b8d`)
+Son ölçüm: **2026-10-21** · Dal: `main` (`c2bb116`) + tek-alan testleri
 
 Bu dosya açık işlerin tek listesidir. Her madde ya **bende** (kod tarafı, bu
 depoda yapılabilir) ya **sizde** (hesap, anahtar, para veya hukuki karar
@@ -15,8 +15,9 @@ dosyalarındadır; burada yalnız **kalan iş** durur.
 
 | | |
 |---|---|
-| Test | **293 geçiyor / 0 kırık** — `shared` 99, `extension` 191, `backend` 3 |
-| Test dosyası | 23 |
+| Test | **307 geçiyor / 0 kırık** — `shared` 99, `extension` 205, `backend` 3 |
+| Test dosyası | 24 |
+| Tek alan okunamadı | **Teste bağlı** — `extension/test/eksikAlan.test.ts`, iki adaptör |
 | Tip denetimi | Üç paket de temiz (`pnpm -r exec tsc --noEmit`) |
 | CI | **Var** — `.github/workflows/ci.yml`; tip, test, iki hedefin paketi ve uçtan uca koşuyor |
 | Uçtan uca | **Var** — `extension/e2e/uzanti.spec.ts`, uzantı yüklü gerçek Chromium |
@@ -40,9 +41,6 @@ pnpm -r exec tsc --noEmit
       açıklama, kilometre alanı hiç yazılmamış ilan, farklı düzendeki detay
       sayfası. Bugünkü fixture'lar `extension/test/fixtures/` altında ve hepsi
       **tam dolu** ilanlardan çıkarılmış.
-- [ ] Bir site adaptörü beklediği alanı bulamadığında ne olacağını teste bağla.
-      Panelin `okunamadi` durumu var ve test ediliyor; eksik olan, **tek bir
-      alanın** okunamadığı ara durum.
 
 > Bu maddenin ön koşulu sizde: yeni fixture ancak gerçek bir ilan sayfasından
 > çıkarılabilir, bu ortamdan ilan sitelerine çıkılmıyor (deponun kendi kırmızı
