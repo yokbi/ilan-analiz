@@ -1,10 +1,10 @@
 import { render } from 'preact'
 import { Anahtar } from './ui/Anahtar'
-import { RENKLER } from './ui/stil'
+import { tema } from './ui/stil'
 
 // Popup kendi belgesi; shadow DOM'a gerek yok, stil kimseyle çakışmıyor.
 const STIL = `
-:root { ${RENKLER} }
+${tema(':root')}
 * { box-sizing: border-box }
 body { margin: 0; width: 320px; background: var(--zemin); color: var(--metin);
   font: 13px/1.55 var(--sans); padding: 16px }
@@ -28,7 +28,7 @@ body { margin: 0; width: 320px; background: var(--zemin); color: var(--metin);
 .giris:focus { outline: none; border-color: var(--metin2) }
 
 .anaDugme { display: block; width: 100%; text-align: center; text-decoration: none;
-  margin-top: 14px; background: var(--yesil); color: #10190f; border: none; border-radius: 5px;
+  margin-top: 14px; background: var(--yesil); color: var(--dugme-metin); border: none; border-radius: 5px;
   padding: 10px; cursor: pointer; font: 700 13px/1.2 var(--sans) }
 .anaDugme:hover { filter: brightness(1.08) }
 .anaDugme:disabled { opacity: .55; cursor: default }
