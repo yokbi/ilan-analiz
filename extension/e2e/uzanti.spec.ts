@@ -143,6 +143,24 @@ test('anahtar varken analiz üretiliyor ve panelde skor görünüyor', async () 
   await sayfa.close()
 })
 
+// Bir önceki testin anahtarı ve Gemini yakalaması bağlamda duruyor; panel dolu çiziliyor.
+for (const [sema, zemin] of [['dark', 'rgb(25, 22, 20)'], ['light', 'rgb(251, 249, 246)']] as const) {
+  test(`panel sistem temasını izliyor: ${sema}`, async () => {
+    const sayfa = await context.newPage()
+    await sayfa.emulateMedia({ colorScheme: sema })
+    await sayfa.route('https://www.sahibinden.com/**', (route) =>
+      route.fulfill({ contentType: 'text/html; charset=utf-8', body: FIXTURE }),
+    )
+    await sayfa.goto(ILAN_URL)
+
+    const panel = sayfa.locator('.panel')
+    await expect(sayfa.getByText('Makul', { exact: true })).toBeVisible({ timeout: 30_000 })
+    await expect(panel).toHaveCSS('background-color', zemin)
+    await panel.screenshot({ path: test.info().outputPath(`panel-${sema}.png`) })
+    await sayfa.close()
+  })
+}
+
 test('desteklenmeyen sitede panel HİÇ çizilmiyor', async () => {
   const sayfa = await context.newPage()
   await sayfa.route('https://example.com/**', (route) =>

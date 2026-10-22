@@ -1,25 +1,58 @@
-// Renk paleti — panelin shadow root'unda VE liste widget'larının kendi shadow root'unda
-// aynı :host değişkenleri olarak kullanılır (bkz. liste.tsx ILERLEME_STIL).
+// Renk paleti — panelin shadow root'unda, liste widget'larının kendi shadow root'unda ve
+// popup'ta aynı CSS değişkenleri olarak kullanılır (bkz. tema()).
 //
 // Yön: sıcak-nötr koyu zemin (araç iç mekânı / gece gösterge paneli), soğuk near-black değil.
 // Ayrı bir accent rengi YOK: panelin karakter rengi skorun semantik rengidir — iyi araçta
 // yeşil, riskli araçta kırmızı. Böylece panel her ilanda kendi kimliğini alır.
-export const RENKLER = `
-  --zemin: #191614; --yuzey: #221e1b; --yuzey2: #2a2521; --kenar: #35302c;
-  --metin: #f0ece7; --metin2: #a89f96; --metin3: #6f665e;
-  --yesil: #4fb06a; --sari: #d99a2b; --kirmizi: #e05c4f;
-  --yesil-zemin: #1a2a1e; --sari-zemin: #2b2416; --kirmizi-zemin: #2d1c19;
+//
+// Açık palet aynı yönün gündüz hâli: sıcak kırık beyaz zemin, semantik renkler beyaz üstünde
+// okunacak kadar koyulaştırılmış. Sistem açık temadaysa (prefers-color-scheme: light) devreye girer.
+// Metin/zemin çiftlerinin WCAG AA (4.5:1) eşiğini geçtiği test/kontrast.test.ts'de ölçülür —
+// bir rengi değiştirirseniz o test söyler.
+export type Palet = Record<
+  | 'zemin' | 'yuzey' | 'yuzey2' | 'kenar' | 'metin' | 'metin2' | 'metin3'
+  | 'yesil' | 'sari' | 'kirmizi' | 'yesil-zemin' | 'sari-zemin' | 'kirmizi-zemin'
+  | 'dugme-metin' | 'golge',
+  string
+>
+
+export const KOYU: Palet = {
+  zemin: '#191614', yuzey: '#221e1b', yuzey2: '#2a2521', kenar: '#35302c',
+  metin: '#f0ece7', metin2: '#a89f96', metin3: '#8f857b',
+  yesil: '#4fb06a', sari: '#d99a2b', kirmizi: '#e05c4f',
+  'yesil-zemin': '#1a2a1e', 'sari-zemin': '#2b2416', 'kirmizi-zemin': '#2d1c19',
+  'dugme-metin': '#10190f', golge: 'rgba(0,0,0,.55)',
+}
+
+export const ACIK: Palet = {
+  zemin: '#fbf9f6', yuzey: '#f3efea', yuzey2: '#ebe5de', kenar: '#ddd5cc',
+  metin: '#1f1a16', metin2: '#564d45', metin3: '#6b6159',
+  yesil: '#25703b', sari: '#8a5800', kirmizi: '#b3352a',
+  'yesil-zemin': '#e4f1e7', 'sari-zemin': '#f7ecd6', 'kirmizi-zemin': '#f8e4e0',
+  'dugme-metin': '#ffffff', golge: 'rgba(40,30,20,.18)',
+}
+
+const degiskenler = (p: Palet) => Object.entries(p).map(([k, v]) => `--${k}: ${v};`).join(' ')
+
+const YAZI = `
   --sans: -apple-system, "Segoe UI", Roboto, sans-serif;
   --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
 `
 
+// Verilen seçicide (:host ya da :root) değişkenleri tanımlar; varsayılan koyu, sistem açıksa açık.
+export const tema = (secici: string) => `
+${secici} { color-scheme: dark; ${degiskenler(KOYU)} ${YAZI} }
+@media (prefers-color-scheme: light) { ${secici} { color-scheme: light; ${degiskenler(ACIK)} } }
+`
+
 export const STIL = `
-:host { all: initial; ${RENKLER} }
+:host { all: initial }
+${tema(':host')}
 * { box-sizing: border-box }
 
 .panel { position: fixed; right: 16px; top: 90px; width: 344px; max-height: 84vh; overflow-y: auto;
   background: var(--zemin); color: var(--metin); border: 1px solid var(--kenar); border-radius: 8px;
-  font: 12.5px/1.55 var(--sans); z-index: 999999; box-shadow: 0 16px 48px rgba(0,0,0,.55) }
+  font: 12.5px/1.55 var(--sans); z-index: 999999; box-shadow: 0 16px 48px var(--golge) }
 .panel::-webkit-scrollbar { width: 8px }
 .panel::-webkit-scrollbar-thumb { background: var(--kenar); border-radius: 4px }
 
@@ -43,7 +76,7 @@ export const STIL = `
 .skorKutu { flex: 0 0 88px; display: flex; flex-direction: column; align-items: center; justify-content: center;
   border-radius: 6px; padding: 10px 0 8px }
 .skorSayi { font: 700 40px/1 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.04em }
-.skorAlt { font: 600 8.5px/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; margin-top: 5px; opacity: .65 }
+.skorAlt { font: 600 8.5px/1 var(--sans); letter-spacing: .12em; text-transform: uppercase; margin-top: 5px }
 .skor-yesil { background: var(--yesil-zemin); color: var(--yesil) }
 .skor-sari { background: var(--sari-zemin); color: var(--sari) }
 .skor-kirmizi { background: var(--kirmizi-zemin); color: var(--kirmizi) }
@@ -164,7 +197,7 @@ export const STIL = `
 
 /* Kota dolduğunda gösterilen yol */
 .yukseltDugme { display: block; margin-top: 12px; padding: 10px 14px; border: none; border-radius: 5px;
-  background: var(--yesil); color: #10190f; font: 700 13px/1.2 var(--sans); cursor: pointer;
+  background: var(--yesil); color: var(--dugme-metin); font: 700 13px/1.2 var(--sans); cursor: pointer;
   text-decoration: none; text-align: center }
 .yukseltDugme:hover { filter: brightness(1.08) }
 .yukseltDugme:focus-visible { outline: 1px solid var(--metin2); outline-offset: 2px }

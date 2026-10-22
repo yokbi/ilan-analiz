@@ -1,6 +1,6 @@
 # İlan Analiz — Yapılacaklar
 
-Son ölçüm: **2026-10-21** · Dal: `main` (`c2bb116`) + eksik/bozuk ilan testleri
+Son ölçüm: **2026-10-22** · Dal: `main` (`90934c0`) + açık tema ve kontrast denetimi
 
 Bu dosya açık işlerin tek listesidir. Her madde ya **bende** (kod tarafı, bu
 depoda yapılabilir) ya **sizde** (hesap, anahtar, para veya hukuki karar
@@ -15,12 +15,13 @@ dosyalarındadır; burada yalnız **kalan iş** durur.
 
 | | |
 |---|---|
-| Test | **322 geçiyor / 0 kırık** — `shared` 99, `extension` 220, `backend` 3 |
-| Test dosyası | 25 |
+| Test | **358 geçiyor / 0 kırık** — `shared` 99, `extension` 256, `backend` 3 |
+| Test dosyası | 26 |
 | Eksik/bozuk ilan | **Teste bağlı** — `extension/test/eksikAlan.test.ts` (tek alan) ve `fixtureEksik.test.ts` (4 elle kurulmuş fixture: eksik, fiyatsız, farklı düzen, arabam eksik) |
 | Tip denetimi | Üç paket de temiz (`pnpm -r exec tsc --noEmit`) |
 | CI | **Var** — `.github/workflows/ci.yml`; tip, test, iki hedefin paketi ve uçtan uca koşuyor |
-| Uçtan uca | **Var** — `extension/e2e/uzanti.spec.ts`, uzantı yüklü gerçek Chromium |
+| Uçtan uca | **Var** — `extension/e2e/uzanti.spec.ts`, uzantı yüklü gerçek Chromium (6 test; iki renk şeması dahil) |
+| Tema | **Koyu + açık** — panel, liste widget'ları ve popup sistem temasını izliyor (`prefers-color-scheme`). Metin/zemin çiftleri iki palette de WCAG AA ≥ 4.5 — `extension/test/kontrast.test.ts` |
 | Desteklenen site | 2 (sahibinden.com, arabam.com) |
 
 Ölçüm komutları:
@@ -44,10 +45,16 @@ verin, gerçek örnek olarak eklenir.
 
 ### 1.2 Arayüz · öncelik: orta
 
-- [ ] Panelde **karanlık tema** desteği ve kontrast denetimi. Bugün tek tema var.
 - [ ] Popup'ın (anahtar girişi) boş / yükleniyor / hata durumlarının gözden
       geçirilmesi.
 - [ ] Panelin farklı zoom seviyelerinde ve dar pencerede taşıp taşmadığı.
+
+> Kontrast denetimi sırasında üç gerçek kusur bulunup düzeltildi: koyu temada
+> `--metin3` (küçük etiketler, placeholder) 2.9–3.2:1'deydi; liste rozetlerinin
+> beyaz yazısı renkli zeminde 2.4–3.6:1'deydi; skor kutusundaki "10 üzerinden"
+> yarı saydamlıkla soluklaşıyordu. Açık tema fixture üzerinde gerçek Chromium'da
+> çizilip bakıldı; canlı
+> sahibinden sayfasının üstünde gözle bakılması 2.2'deki kontrole dahil.
 
 > Stil sızıntısı bu listede **yok**: panel `attachShadow` ile Shadow DOM içine
 > kuruluyor, sitenin CSS'i panele geçemiyor. Bakıldı, risk yok.

@@ -1,6 +1,6 @@
 import type { ScoreResult } from 'shared'
 import { skorRenk } from './skor'
-import { RENKLER } from './stil'
+import { tema } from './stil'
 
 export function chunk<T>(xs: T[], n: number): T[][] {
   const c: T[][] = []
@@ -10,12 +10,13 @@ export function chunk<T>(xs: T[], n: number): T[][] {
 
 // Liste rozetleri shadow DOM DIŞINDA (satırların içinde) — stiller aa- önekiyle sayfaya enjekte edilir.
 // Sayfa CSS'ine :host değişkenleri sızmasın diye burada düz (literal) renk değerleri kullanılır.
+// Rozet yazısı koyu: beyaz yazı bu üç zeminde 2.4–3.6:1'de kalıyor (bkz. kontrast.test.ts).
 export const LISTE_STIL = `
 tr.aa-yesil > td, td.aa-yesil { background: #eef7f0 !important }
 tr.aa-sari > td, td.aa-sari { background: #fbf6e9 !important }
 tr.aa-kirmizi > td, td.aa-kirmizi { background: #fbeeee !important }
 .aa-rozet { position: absolute; top: 5px; left: 5px; z-index: 10; border-radius: 6px; padding: 3px 8px;
-  font: 700 13px/1.1 -apple-system, sans-serif; color: #fff; cursor: pointer;
+  font: 700 13px/1.1 -apple-system, sans-serif; color: #14110f; cursor: pointer;
   box-shadow: 0 0 0 2px rgba(255,255,255,.9), 0 2px 6px rgba(0,0,0,.35) }
 .aa-rozet.aa-r-yesil { background: #4fb06a } .aa-rozet.aa-r-sari { background: #d99a2b } .aa-rozet.aa-r-kirmizi { background: #e05c4f }
 `
@@ -34,7 +35,7 @@ export function rozetBas(satir: Element, skor: ScoreResult, acKart: (s: ScoreRes
   hucre.appendChild(rozet)
 }
 
-// Popup kart + ilerleme widget'ı (shadow DOM içinde — panelle aynı koyu palet)
+// Popup kart + ilerleme widget'ı (shadow DOM içinde — panelle aynı palet)
 export type IlerlemeDurum = { yapilan: number; toplam: number; durduruldu: boolean; durdur: () => void }
 
 export function Kart({ s, kapat }: { s: ScoreResult; kapat: () => void }) {
@@ -61,10 +62,11 @@ export function Ilerleme({ d }: { d: IlerlemeDurum }) {
 }
 
 export const ILERLEME_STIL = `
-:host { all: initial; ${RENKLER} }
+:host { all: initial }
+${tema(':host')}
 .ilerleme { position: fixed; right: 16px; bottom: 16px; z-index: 999999; width: 200px;
   background: var(--zemin); color: var(--metin); border: 1px solid var(--kenar); border-radius: 8px; padding: 12px;
-  font: 12.5px/1.5 -apple-system, sans-serif; box-shadow: 0 10px 40px rgba(0,0,0,.5) }
+  font: 12.5px/1.5 -apple-system, sans-serif; box-shadow: 0 10px 40px var(--golge) }
 .ilerlemeBaslik { font: 600 13px/1 -apple-system, sans-serif }
 .sayac { font-size: 11.5px; color: var(--metin2); margin: 8px 0 }
 .durdur { width: 100%; background: none; color: var(--metin); border: 1px solid var(--kenar);
@@ -72,7 +74,7 @@ export const ILERLEME_STIL = `
 .durdur:hover { color: var(--kirmizi); border-color: var(--kirmizi) }
 
 .kart { position: fixed; z-index: 999999; width: 240px; background: var(--zemin); color: var(--metin); border: 1px solid var(--kenar);
-  border-radius: 10px; padding: 12px; font: 12.5px/1.5 -apple-system, sans-serif; box-shadow: 0 10px 40px rgba(0,0,0,.5) }
+  border-radius: 10px; padding: 12px; font: 12.5px/1.5 -apple-system, sans-serif; box-shadow: 0 10px 40px var(--golge) }
 .kartBaslik { display: flex; justify-content: space-between; align-items: center }
 .kart .skor { font: 700 20px/1 -apple-system, sans-serif; padding: 4px 10px; border-radius: 6px }
 .kart .skor.skor-yesil { background: var(--yesil-zemin); color: var(--yesil) }
