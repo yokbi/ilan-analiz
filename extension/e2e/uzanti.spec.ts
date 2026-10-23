@@ -73,8 +73,11 @@ test.afterAll(async () => {
 })
 
 async function serviceWorker(): Promise<Worker> {
-  const mevcut = context.serviceWorkers()[0]
-  return mevcut ?? (await context.waitForEvent('serviceworker'))
+  const sw = context.serviceWorkers()[0] ?? (await context.waitForEvent('serviceworker'))
+  // Worker göründüğü anda `chrome.storage` henüz bağlanmamış olabiliyor; taze bir bağlamda ilk
+  // yazma "reading 'local'" ile düşüyordu.
+  await expect.poll(() => sw.evaluate(() => typeof chrome !== 'undefined' && !!chrome.storage)).toBe(true)
+  return sw
 }
 
 /** Uzantının deposuna anahtar yazar — popup'ı sürmeden. */
@@ -173,3 +176,56 @@ test('desteklenmeyen sitede panel HİÇ çizilmiyor', async () => {
   await expect(sayfa.getByText('Makul', { exact: true })).toHaveCount(0)
   await sayfa.close()
 })
+
+// Tarayıcı zoom'u CSS görüntü alanını küçültür: 1280×720 pencerede %200 zoom, 640×360'lık bir
+// CSS görüntü alanıdır (deviceScaleFactor 2). Bu yüzden zoom seviyeleri görüntü alanı olarak
+// sınanıyor. Panelin her köşesi ekranda kalmalı ve içeriği yatay kaydırma istememeli; gövde
+// dikeyde kaydırılabilir — ama yalnız panelin kendi içinde, kesilmeden.
+for (const [ad, genislik, yukseklik, olcek] of [
+  ['%100', 1280, 720, 1], ['%200', 640, 360, 2], ['%300', 427, 240, 3],
+  ['dar pencere', 360, 640, 1], ['çok dar pencere', 300, 520, 1],
+] as const) {
+  test(`panel taşmıyor: ${ad} (${genislik}×${yukseklik})`, async () => {
+    // Önceki bir test düşerse Playwright işçiyi yeniden başlatıp bağlamı sıfırdan kurar; bu
+    // yüzden anahtar ve Gemini yakalaması burada yeniden veriliyor.
+    await anahtarYaz('AIzaSyTestAnahtariUzunOlsunDiyeUzatildi')
+    await context.route('https://generativelanguage.googleapis.com/**', (route) =>
+      route.fulfill({
+        contentType: 'application/json',
+        body: JSON.stringify({
+          candidates: [
+            { content: { parts: [{ text: JSON.stringify(AI_CEVAP) }] }, finishReason: 'STOP' },
+          ],
+        }),
+      }),
+    )
+    const sayfa = await context.newPage()
+    await sayfa.setViewportSize({ width: genislik, height: yukseklik })
+    await sayfa.route('https://www.sahibinden.com/**', (route) =>
+      route.fulfill({ contentType: 'text/html; charset=utf-8', body: FIXTURE }),
+    )
+    await sayfa.goto(ILAN_URL)
+    await expect(sayfa.getByText('Makul', { exact: true })).toBeVisible({ timeout: 30_000 })
+
+    const olcu = await sayfa.locator('.panel').evaluate((p) => {
+      const r = p.getBoundingClientRect()
+      return {
+        sol: r.left, ust: r.top, sag: r.right, alt: r.bottom,
+        yatayTasma: p.scrollWidth - p.clientWidth,
+        // İçerideki herhangi bir öğe panelin sağ kenarını geçiyor mu?
+        tasanlar: [...p.querySelectorAll('*')]
+          .filter((e) => e.getBoundingClientRect().right > r.right + 0.5)
+          .map((e) => e.className || e.tagName),
+      }
+    })
+    expect(olcu.sol).toBeGreaterThanOrEqual(0)
+    expect(olcu.ust).toBeGreaterThanOrEqual(0)
+    expect(olcu.sag).toBeLessThanOrEqual(genislik)
+    expect(olcu.alt).toBeLessThanOrEqual(yukseklik)
+    expect(olcu.yatayTasma).toBe(0)
+    expect(olcu.tasanlar).toEqual([])
+
+    await sayfa.screenshot({ path: test.info().outputPath(`zoom-${genislik}x${yukseklik}@${olcek}.png`) })
+    await sayfa.close()
+  })
+}

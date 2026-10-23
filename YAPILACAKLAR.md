@@ -1,6 +1,6 @@
 # İlan Analiz — Yapılacaklar
 
-Son ölçüm: **2026-10-23** · Dal: `main` (`01983c6`) + popup durumlarının gözden geçirilmesi
+Son ölçüm: **2026-10-23** · Dal: `main` (`50f7590`) + panelin zoom/dar pencere denetimi
 
 Bu dosya açık işlerin tek listesidir. Her madde ya **bende** (kod tarafı, bu
 depoda yapılabilir) ya **sizde** (hesap, anahtar, para veya hukuki karar
@@ -20,8 +20,9 @@ dosyalarındadır; burada yalnız **kalan iş** durur.
 | Eksik/bozuk ilan | **Teste bağlı** — `extension/test/eksikAlan.test.ts` (tek alan) ve `fixtureEksik.test.ts` (4 elle kurulmuş fixture: eksik, fiyatsız, farklı düzen, arabam eksik) |
 | Tip denetimi | Üç paket de temiz (`pnpm -r exec tsc --noEmit`) |
 | CI | **Var** — `.github/workflows/ci.yml`; tip, test, iki hedefin paketi ve uçtan uca koşuyor |
-| Uçtan uca | **Var** — `extension/e2e/uzanti.spec.ts`, uzantı yüklü gerçek Chromium (6 test; iki renk şeması dahil) |
+| Uçtan uca | **Var** — `extension/e2e/uzanti.spec.ts`, uzantı yüklü gerçek Chromium (11 test; iki renk şeması ve beş görüntü alanı dahil) |
 | Tema | **Koyu + açık** — panel, liste widget'ları ve popup sistem temasını izliyor (`prefers-color-scheme`). Metin/zemin çiftleri iki palette de WCAG AA ≥ 4.5 — `extension/test/kontrast.test.ts` |
+| Zoom / dar pencere | Panel %100, %200, %300 zoom'da ve 360 / 300 px genişlikte ekranda kalıyor, yatay taşmıyor — `e2e/uzanti.spec.ts` "panel taşmıyor" |
 | Popup durumları | Yükleniyor / boş / hata / kayıtlı — hiçbir yol popup'ı kilitli bırakmıyor (depo okuma, kaydetme, silme hataları ve Google 5xx ayrı mesajla). `extension/test/anahtar.test.tsx` |
 | Desteklenen site | 2 (sahibinden.com, arabam.com) |
 
@@ -46,7 +47,15 @@ verin, gerçek örnek olarak eklenir.
 
 ### 1.2 Arayüz · öncelik: orta
 
-- [ ] Panelin farklı zoom seviyelerinde ve dar pencerede taşıp taşmadığı.
+Kod tarafında açık madde kalmadı.
+
+> Zoom / dar pencere denetiminde iki gerçek kusur bulunup düzeltildi: panel
+> `top: 90px` + `max-height: 84vh` ile kuruluyordu; %200 zoom'da (640×360 CSS
+> görüntü alanı) alt kenarı 32 px, %300'de 52 px ekran dışına taşıyor, panelin
+> sonu kaydırılamıyordu. Sabit 344 px genişlik 376 px'ten dar pencerede sol
+> kenarı dışarı itiyordu (300 px'te −60). Boyutlar artık görüntü alanına bağlı.
+> Zoom, görüntü alanı küçültülerek ölçülüyor — tarayıcının kendi zoom'u CSS
+> açısından aynı şey.
 
 > Kontrast denetimi sırasında üç gerçek kusur bulunup düzeltildi: koyu temada
 > `--metin3` (küçük etiketler, placeholder) 2.9–3.2:1'deydi; liste rozetlerinin

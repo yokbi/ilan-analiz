@@ -50,7 +50,13 @@ export const STIL = `
 ${tema(':host')}
 * { box-sizing: border-box }
 
-.panel { position: fixed; right: 16px; top: 90px; width: 344px; max-height: 84vh; overflow-y: auto;
+/* Boyutlar görüntü alanına bağlı: tarayıcı zoom'u CSS görüntü alanını küçültür (%200 zoom'da
+   1280×720 pencere 640×360 olur). Sabit top + vh oranı alt kenarı ekrandan taşırıp sonunu
+   kaydırılamaz bırakıyordu; sabit genişlik dar pencerede sol kenarı dışarı itiyordu.
+   Ölçüm: e2e/uzanti.spec.ts "panel taşmıyor". */
+.panel { position: fixed; right: min(16px, 4vw); top: min(90px, 15vh);
+  width: min(344px, calc(100vw - 2 * min(16px, 4vw)));
+  max-height: calc(100vh - min(90px, 15vh) - min(16px, 4vw)); overflow-y: auto; overflow-wrap: anywhere;
   background: var(--zemin); color: var(--metin); border: 1px solid var(--kenar); border-radius: 8px;
   font: 12.5px/1.55 var(--sans); z-index: 999999; box-shadow: 0 16px 48px var(--golge) }
 .panel::-webkit-scrollbar { width: 8px }
