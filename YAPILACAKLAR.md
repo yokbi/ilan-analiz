@@ -1,6 +1,6 @@
 # İlan Analiz — Yapılacaklar
 
-Son ölçüm: **2026-10-22** · Dal: `main` (`90934c0`) + açık tema ve kontrast denetimi
+Son ölçüm: **2026-10-23** · Dal: `main` (`01983c6`) + popup durumlarının gözden geçirilmesi
 
 Bu dosya açık işlerin tek listesidir. Her madde ya **bende** (kod tarafı, bu
 depoda yapılabilir) ya **sizde** (hesap, anahtar, para veya hukuki karar
@@ -15,13 +15,14 @@ dosyalarındadır; burada yalnız **kalan iş** durur.
 
 | | |
 |---|---|
-| Test | **358 geçiyor / 0 kırık** — `shared` 99, `extension` 256, `backend` 3 |
+| Test | **365 geçiyor / 0 kırık** — `shared` 99, `extension` 263, `backend` 3 |
 | Test dosyası | 26 |
 | Eksik/bozuk ilan | **Teste bağlı** — `extension/test/eksikAlan.test.ts` (tek alan) ve `fixtureEksik.test.ts` (4 elle kurulmuş fixture: eksik, fiyatsız, farklı düzen, arabam eksik) |
 | Tip denetimi | Üç paket de temiz (`pnpm -r exec tsc --noEmit`) |
 | CI | **Var** — `.github/workflows/ci.yml`; tip, test, iki hedefin paketi ve uçtan uca koşuyor |
 | Uçtan uca | **Var** — `extension/e2e/uzanti.spec.ts`, uzantı yüklü gerçek Chromium (6 test; iki renk şeması dahil) |
 | Tema | **Koyu + açık** — panel, liste widget'ları ve popup sistem temasını izliyor (`prefers-color-scheme`). Metin/zemin çiftleri iki palette de WCAG AA ≥ 4.5 — `extension/test/kontrast.test.ts` |
+| Popup durumları | Yükleniyor / boş / hata / kayıtlı — hiçbir yol popup'ı kilitli bırakmıyor (depo okuma, kaydetme, silme hataları ve Google 5xx ayrı mesajla). `extension/test/anahtar.test.tsx` |
 | Desteklenen site | 2 (sahibinden.com, arabam.com) |
 
 Ölçüm komutları:
@@ -45,8 +46,6 @@ verin, gerçek örnek olarak eklenir.
 
 ### 1.2 Arayüz · öncelik: orta
 
-- [ ] Popup'ın (anahtar girişi) boş / yükleniyor / hata durumlarının gözden
-      geçirilmesi.
 - [ ] Panelin farklı zoom seviyelerinde ve dar pencerede taşıp taşmadığı.
 
 > Kontrast denetimi sırasında üç gerçek kusur bulunup düzeltildi: koyu temada
@@ -55,6 +54,12 @@ verin, gerçek örnek olarak eklenir.
 > yarı saydamlıkla soluklaşıyordu. Açık tema fixture üzerinde gerçek Chromium'da
 > çizilip bakıldı; canlı
 > sahibinden sayfasının üstünde gözle bakılması 2.2'deki kontrole dahil.
+
+> Popup gözden geçirmesinde dört gerçek kusur bulunup düzeltildi: depo okuması
+> reddedilince popup sonsuza dek "Yükleniyor…"da kalıyordu; doğrulanan anahtar
+> kaydedilemezse düğme "Doğrulanıyor…"da kilitleniyordu; silme hatası sessizce
+> yutuluyordu; Google'ın 5xx arızası "anahtar geçerli değil" diye gösterilip
+> kullanıcıya sağlam anahtarını attırıyordu.
 
 > Stil sızıntısı bu listede **yok**: panel `attachShadow` ile Shadow DOM içine
 > kuruluyor, sitenin CSS'i panele geçemiyor. Bakıldı, risk yok.
