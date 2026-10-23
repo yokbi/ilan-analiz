@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest'
 import {
-  anahtarGetir, anahtarKaydet, anahtarSil, anahtarDogrula, anahtarMaskele, VARSAYILAN_MODEL
+  anahtarGetir, anahtarKaydet, anahtarSil, anahtarDogrula, anahtarMaskele, VARSAYILAN_MODEL, ANAHTAR_HATA
 } from '../src/anahtar'
 
 const yanit = (status: number): any => ({ ok: status >= 200 && status < 300, status })
@@ -59,6 +59,17 @@ describe('anahtar doğrulama', () => {
     expect(await anahtarDogrula('k', ile(400))).toEqual({ ok: false, hata: 'gecersiz' })
     expect(await anahtarDogrula('k', ile(403))).toEqual({ ok: false, hata: 'yetki' })
     expect(await anahtarDogrula('k', ile(429))).toEqual({ ok: false, hata: 'kota' })
+  })
+
+  it('Google arızası (5xx) "anahtar geçersiz" sayılmaz — sağlam anahtar atılmasın', async () => {
+    const ile = (s: number): any => async () => yanit(s)
+    expect(await anahtarDogrula('k', ile(500))).toEqual({ ok: false, hata: 'sunucu' })
+    expect(await anahtarDogrula('k', ile(503))).toEqual({ ok: false, hata: 'sunucu' })
+  })
+
+  it('her hata kodunun kullanıcıya gösterilecek bir metni var', () => {
+    for (const k of ['bos', 'gecersiz', 'yetki', 'kota', 'ag', 'sunucu', 'depo', 'sil'])
+      expect(ANAHTAR_HATA[k], k).toBeTruthy()
   })
 
   it('ağ hatası kota/geçersizden ayrı tutulur — teşhis için şart', async () => {
@@ -147,5 +158,88 @@ describe('Anahtar arayüzü', () => {
     kok.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
     await bekleKadar(() => (kok.textContent ?? '').includes('Hazır'), 'hazır ekranı')
     expect(kutu['geminiAnahtar']).toBe('AIzaSyGecerliAnahtar12345')
+  })
+
+  // Boş / yükleniyor / hata durumları: hiçbir yol popup'ı kilitli bırakmamalı.
+  it('yüklenirken durum duyurulur', async () => {
+    let birak!: (v: any) => void
+    ;(globalThis as any).chrome.storage.local.get = () => new Promise(r => { birak = r })
+    const { render } = await import('preact')
+    const { Anahtar } = await import('../src/ui/Anahtar')
+    const kok = document.createElement('div')
+    render(<Anahtar />, kok)
+    await bekleKadar(() => !!kok.querySelector('[role=status]'), 'yükleniyor')
+    expect(kok.textContent).toContain('Yükleniyor')
+    await bekleKadar(() => typeof birak === 'function', 'depo okuması başladı')
+    birak({})
+    await bekleKadar(() => !!kok.querySelector('#anahtar'), 'form')
+  })
+
+  it('depo okunamazsa sonsuz "Yükleniyor…" yerine hata ve tekrar dene çıkar', async () => {
+    const yerel = (globalThis as any).chrome.storage.local
+    const asil = yerel.get
+    yerel.get = async () => { throw new Error('depo kapalı') }
+    const { render } = await import('preact')
+    const { Anahtar } = await import('../src/ui/Anahtar')
+    const kok = document.createElement('div')
+    render(<Anahtar />, kok)
+    await bekleKadar(() => !!kok.querySelector('[role=alert]'), 'okuma hatası')
+    expect(kok.textContent).not.toContain('Yükleniyor')
+
+    yerel.get = asil
+    ;(kok.querySelector('button') as HTMLButtonElement).click()
+    await bekleKadar(() => !!kok.querySelector('#anahtar'), 'tekrar denemede form')
+  })
+
+  it('doğrulanan anahtar kaydedilemezse düğme kilitli kalmaz, hata görünür', async () => {
+    ;(globalThis as any).fetch = async () => ({ ok: true, status: 200 })
+    ;(globalThis as any).chrome.storage.local.set = async () => { throw new Error('kota') }
+    const { render } = await import('preact')
+    const { Anahtar } = await import('../src/ui/Anahtar')
+    const kok = document.createElement('div')
+    render(<Anahtar />, kok)
+    await bekleKadar(() => !!kok.querySelector('#anahtar'), 'form')
+
+    ;(kok.querySelector('#anahtar') as HTMLInputElement).value = 'AIzaSyGecerliAnahtar12345'
+    kok.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+    await bekleKadar(() => (kok.textContent ?? '').includes('kaydedilemedi'), 'kayıt hatası')
+    const dugme = kok.querySelector('button[type=submit]') as HTMLButtonElement
+    expect(dugme.disabled).toBe(false)
+    expect(dugme.textContent).toContain('Kaydet')
+  })
+
+  it('yeni yazmaya başlayınca eski hata kalkar', async () => {
+    ;(globalThis as any).fetch = async () => ({ ok: false, status: 400 })
+    const { render } = await import('preact')
+    const { Anahtar } = await import('../src/ui/Anahtar')
+    const kok = document.createElement('div')
+    render(<Anahtar />, kok)
+    await bekleKadar(() => !!kok.querySelector('#anahtar'), 'form')
+
+    const alan = kok.querySelector('#anahtar') as HTMLInputElement
+    alan.value = 'AIzaSyBozuk'
+    kok.querySelector('form')!.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }))
+    await bekleKadar(() => !!kok.querySelector('[role=alert]'), 'hata')
+    alan.dispatchEvent(new Event('input', { bubbles: true }))
+    await bekleKadar(() => !kok.querySelector('[role=alert]'), 'hata kalktı')
+  })
+
+  it('silme başarısızsa kayıtlı ekranda kalır ve hata gösterir', async () => {
+    kutu['geminiAnahtar'] = 'AIzaSyABCDEFGHIJKLMNOP1234'
+    ;(globalThis as any).chrome.storage.local.remove = async () => { throw new Error('kilitli') }
+    const { render } = await import('preact')
+    const { Anahtar } = await import('../src/ui/Anahtar')
+    const kok = document.createElement('div')
+    render(<Anahtar />, kok)
+    await bekleKadar(() => (kok.textContent ?? '').includes('Hazır'), 'kayıtlı ekran')
+
+    const dugmeBul = (m: string) =>
+      [...kok.querySelectorAll('button')].find(b => b.textContent?.includes(m)) as HTMLButtonElement
+    dugmeBul('Anahtarı sil').click()
+    await bekleKadar(() => !!dugmeBul('Evet, sil'), 'onay')
+    dugmeBul('Evet, sil').click()
+    await bekleKadar(() => (kok.textContent ?? '').includes('silinemedi'), 'silme hatası')
+    expect(kok.textContent).toContain('Hazır')
+    expect(kutu['geminiAnahtar']).toBe('AIzaSyABCDEFGHIJKLMNOP1234')
   })
 })

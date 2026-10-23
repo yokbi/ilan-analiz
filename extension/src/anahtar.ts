@@ -30,7 +30,10 @@ export const ANAHTAR_HATA: Record<string, string> = {
   gecersiz: 'Bu anahtar geçerli değil. Google AI Studio’dan kopyaladığından emin ol.',
   yetki: 'Anahtar bu API için yetkili değil. Google AI Studio’da Gemini API’nin açık olduğunu kontrol et.',
   kota: 'Anahtarın kotası dolu görünüyor. Google AI Studio’dan kullanım limitine bak.',
-  ag: 'Google’a ulaşılamadı. İnternet bağlantını kontrol et.'
+  ag: 'Google’a ulaşılamadı. İnternet bağlantını kontrol et.',
+  sunucu: 'Google şu an yanıt veremiyor; anahtarın büyük ihtimalle sağlam. Birazdan tekrar dene.',
+  depo: 'Anahtar doğrulandı ama tarayıcıya kaydedilemedi. Uzantıyı yeniden yükleyip tekrar dene.',
+  sil: 'Anahtar silinemedi. Uzantıyı yeniden yükleyip tekrar dene.'
 }
 
 // Doğrulama TEK MODEL SORGUSU ile yapılıyor: token harcamıyor, ücretsiz, ve hem
@@ -51,6 +54,9 @@ export async function anahtarDogrula(
   // Google geçersiz anahtara 400 "API key not valid" veriyor; 403 yetki, 429 kota.
   if (res.status === 429) return { ok: false, hata: 'kota' }
   if (res.status === 403) return { ok: false, hata: 'yetki' }
+  // 5xx Google'ın arızası: "anahtar geçersiz" demek kullanıcıya sağlam anahtarını
+  // attırır.
+  if (res.status >= 500) return { ok: false, hata: 'sunucu' }
   return { ok: false, hata: 'gecersiz' }
 }
 
