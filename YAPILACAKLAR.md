@@ -1,6 +1,6 @@
 # İlan Analiz — Yapılacaklar
 
-Son ölçüm: **2026-10-23** · Dal: `main` (`50f7590`) + panelin zoom/dar pencere denetimi
+Son ölçüm: **2026-10-23** · Dal: `main` (`8ea8e7b`) + mağaza izin gerekçeleri
 
 Bu dosya açık işlerin tek listesidir. Her madde ya **bende** (kod tarafı, bu
 depoda yapılabilir) ya **sizde** (hesap, anahtar, para veya hukuki karar
@@ -15,8 +15,8 @@ dosyalarındadır; burada yalnız **kalan iş** durur.
 
 | | |
 |---|---|
-| Test | **365 geçiyor / 0 kırık** — `shared` 99, `extension` 263, `backend` 3 |
-| Test dosyası | 26 |
+| Test | **370 geçiyor / 0 kırık** — `shared` 99, `extension` 268, `backend` 3 |
+| Test dosyası | 27 |
 | Eksik/bozuk ilan | **Teste bağlı** — `extension/test/eksikAlan.test.ts` (tek alan) ve `fixtureEksik.test.ts` (4 elle kurulmuş fixture: eksik, fiyatsız, farklı düzen, arabam eksik) |
 | Tip denetimi | Üç paket de temiz (`pnpm -r exec tsc --noEmit`) |
 | CI | **Var** — `.github/workflows/ci.yml`; tip, test, iki hedefin paketi ve uçtan uca koşuyor |
@@ -25,6 +25,7 @@ dosyalarındadır; burada yalnız **kalan iş** durur.
 | Zoom / dar pencere | Panel %100, %200, %300 zoom'da ve 360 / 300 px genişlikte ekranda kalıyor, yatay taşmıyor — `e2e/uzanti.spec.ts` "panel taşmıyor" |
 | Popup durumları | Yükleniyor / boş / hata / kayıtlı — hiçbir yol popup'ı kilitli bırakmıyor (depo okuma, kaydetme, silme hataları ve Google 5xx ayrı mesajla). `extension/test/anahtar.test.tsx` |
 | Desteklenen site | 2 (sahibinden.com, arabam.com) |
+| Mağaza gizlilik metinleri | **Hazır** — `extension/magaza/izin-gerekceleri.md`: tek amaç, `storage`, üç host izni, uzak kod, veri beyanı. Manifest'le ayrışırsa `extension/test/magazaMetni.test.ts` patlar |
 
 Ölçüm komutları:
 
@@ -75,8 +76,6 @@ Kod tarafında açık madde kalmadı.
 
 ### 1.3 Mağaza için kod tarafı hazırlık · öncelik: orta
 
-- [ ] Chrome Web Store'un istediği **izin gerekçesi** metinleri (`storage` ve
-      iki host izni için).
 - [ ] Mağaza listesi ekran görüntülerinin Playwright ile üretilmesi.
 - [ ] Sürüm numarası ve değişiklik notu akışı (`npm run paket` zaten zip üretiyor).
 
@@ -127,6 +126,10 @@ gerçek bir Firefox'ta açılmadı.**
 - [ ] Firefox AMO hesabı (ücretsiz).
 - [ ] Gizlilik politikası sayfasının bir yere kurulması — `backend/` bunu
       sunmak için var, `package.json`'da `railway` betiği hazır.
+- [ ] Chrome panelinin **Privacy practices** sekmesine
+      [`extension/magaza/izin-gerekceleri.md`](extension/magaza/izin-gerekceleri.md)
+      metinlerini yapıştırmak. İletişim e-postası ve şirket adı gizlilik
+      politikasında hâlâ varsayılan (`ILETISIM_EPOSTA`, `SIRKET_ADI`).
 - [ ] Mağaza incelemesi. Geniş host izni + harici API çağrısı yapan uzantılar
       elle inceleniyor; süreç günler sürebilir ve sorulara cevap veren bir insan
       ister.
