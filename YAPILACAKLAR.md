@@ -1,6 +1,6 @@
 # İlan Analiz — Yapılacaklar
 
-Son ölçüm: **2026-10-23** · Dal: `main` (`8ea8e7b`) + mağaza izin gerekçeleri
+Son ölçüm: **2026-10-24** · Dal: `main` (`242f68f`) + mağaza ekran görüntüleri ve sürüm akışı
 
 Bu dosya açık işlerin tek listesidir. Her madde ya **bende** (kod tarafı, bu
 depoda yapılabilir) ya **sizde** (hesap, anahtar, para veya hukuki karar
@@ -15,8 +15,8 @@ dosyalarındadır; burada yalnız **kalan iş** durur.
 
 | | |
 |---|---|
-| Test | **370 geçiyor / 0 kırık** — `shared` 99, `extension` 268, `backend` 3 |
-| Test dosyası | 27 |
+| Test | **387 geçiyor / 0 kırık** — `shared` 99, `extension` 285, `backend` 3 |
+| Test dosyası | 28 |
 | Eksik/bozuk ilan | **Teste bağlı** — `extension/test/eksikAlan.test.ts` (tek alan) ve `fixtureEksik.test.ts` (4 elle kurulmuş fixture: eksik, fiyatsız, farklı düzen, arabam eksik) |
 | Tip denetimi | Üç paket de temiz (`pnpm -r exec tsc --noEmit`) |
 | CI | **Var** — `.github/workflows/ci.yml`; tip, test, iki hedefin paketi ve uçtan uca koşuyor |
@@ -25,6 +25,8 @@ dosyalarındadır; burada yalnız **kalan iş** durur.
 | Zoom / dar pencere | Panel %100, %200, %300 zoom'da ve 360 / 300 px genişlikte ekranda kalıyor, yatay taşmıyor — `e2e/uzanti.spec.ts` "panel taşmıyor" |
 | Popup durumları | Yükleniyor / boş / hata / kayıtlı — hiçbir yol popup'ı kilitli bırakmıyor (depo okuma, kaydetme, silme hataları ve Google 5xx ayrı mesajla). `extension/test/anahtar.test.tsx` |
 | Desteklenen site | 2 (sahibinden.com, arabam.com) |
+| Mağaza ekran görüntüleri | **Üretiliyor** — `npm run magaza:ekran` (extension içinde): 1280×800, dört PNG (detay koyu/açık, liste, popup) → `extension/magaza/ekranlar/`. Uçtan uca testlerle aynı kurulum (`e2e/baglam.ts`), ağ yok |
+| Sürüm / değişiklik notu | **Akış var** — `npm run surum -- patch\|minor\|major` manifest sürümünü artırıp `extension/DEGISIKLIKLER.md`'ye başlık açıyor; `npm run paket` notu boş ya da sürümü geçersizse zip üretmiyor. `extension/test/surum.test.ts` |
 | Mağaza gizlilik metinleri | **Hazır** — `extension/magaza/izin-gerekceleri.md`: tek amaç, `storage`, üç host izni, uzak kod, veri beyanı. Manifest'le ayrışırsa `extension/test/magazaMetni.test.ts` patlar |
 
 Ölçüm komutları:
@@ -76,8 +78,13 @@ Kod tarafında açık madde kalmadı.
 
 ### 1.3 Mağaza için kod tarafı hazırlık · öncelik: orta
 
-- [ ] Mağaza listesi ekran görüntülerinin Playwright ile üretilmesi.
-- [ ] Sürüm numarası ve değişiklik notu akışı (`npm run paket` zaten zip üretiyor).
+Kod tarafında açık madde kalmadı.
+
+> Ekran görüntüleri kaydedilmiş fixture sayfalarının üstünde çekiliyor; fixture'larda
+> sitenin kendi CSS'i yok, bu yüzden panelin arkasındaki sayfa biçimsiz görünüyor.
+> Panel, liste rozetleri ve popup gerçek paketten çiziliyor. Daha vitrinlik bir görüntü
+> isterseniz 2.2'deki canlı kontrolde gerçek bir ilan sayfasında 1280×800 pencereyle
+> elle çekin; bu betik o zaman yalnız arayüz değişikliklerinin takibi için kalır.
 
 ### 1.4 Yeni site desteği · öncelik: düşük
 
@@ -126,6 +133,8 @@ gerçek bir Firefox'ta açılmadı.**
 - [ ] Firefox AMO hesabı (ücretsiz).
 - [ ] Gizlilik politikası sayfasının bir yere kurulması — `backend/` bunu
       sunmak için var, `package.json`'da `railway` betiği hazır.
+- [ ] Mağaza listesine ekran görüntülerini (`npm run magaza:ekran`) ve
+      `extension/DEGISIKLIKLER.md`'deki sürüm notunu yüklemek.
 - [ ] Chrome panelinin **Privacy practices** sekmesine
       [`extension/magaza/izin-gerekceleri.md`](extension/magaza/izin-gerekceleri.md)
       metinlerini yapıştırmak. İletişim e-postası ve şirket adı gizlilik
@@ -161,7 +170,7 @@ gerçek bir Firefox'ta açılmadı.**
 2. **2.2** — canlı sayfa doğrulaması. En sessiz kırılma noktası burası.
 3. **1.1** — 2.2'den çıkacak gerçek eksik ilan örneklerini fixture'a eklemek.
 4. **2.3** — Firefox yüklemesi.
-5. **1.2 / 1.3** — arayüz ve mağaza hazırlığı.
+5. **1.4** — üçüncü site adaptörü (isteğe bağlı).
 6. **2.4 / 2.5** — yayın ve hukuk.
 
 ---
