@@ -1,6 +1,7 @@
 import { build } from 'esbuild'
 import { cpSync, mkdirSync, readFileSync, writeFileSync, rmSync } from 'node:fs'
 import { execFileSync } from 'node:child_process'
+import { surumGecerli, surumNotu, NOTLAR } from './surum.mjs'
 
 // pnpm build   → geliştirme paketi (okunur çıktı)
 // pnpm paket   → dağıtım paketi (minify + zip)
@@ -70,6 +71,11 @@ mkdirSync(`${CIKTI}/icons`, { recursive: true })
 cpSync('public/icons', `${CIKTI}/icons`, { recursive: true })
 
 if (paketle) {
+  // Mağazaya not yazılmamış ya da geçersiz sürümlü bir paket gitmesin (bkz. surum.mjs).
+  if (!surumGecerli(manifest.version)) throw new Error(`manifest sürümü geçersiz: ${manifest.version}`)
+  if (!surumNotu(readFileSync(NOTLAR, 'utf8'), manifest.version)) {
+    throw new Error(`DEGISIKLIKLER.md'de "## ${manifest.version}" başlığı yok ya da boş — önce notu yazın`)
+  }
   const zip = `ilan-analiz${firefox ? '-firefox' : ''}-${manifest.version}.zip`
   rmSync(zip, { force: true })
   // Chrome Web Store zip'i dist içeriğini KÖKTE bekler, dist/ klasörü sarmalı olarak değil.

@@ -5,7 +5,9 @@
     "test": "vitest run",
     "build": "node build.mjs",
     "paket": "PAKET=1 node build.mjs",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "magaza:ekran": "playwright test -c playwright.magaza.config.ts",
+    "surum": "node surum.mjs"
   },
   "dependencies": {
     "preact": "^10.24.0",
