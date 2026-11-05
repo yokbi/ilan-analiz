@@ -15,7 +15,7 @@ dosyalarındadır; burada yalnız **kalan iş** durur.
 
 | | |
 |---|---|
-| Test | **390 geçiyor / 0 kırık** — `shared` 102, `extension` 285, `backend` 3 |
+| Test | **396 geçiyor / 0 kırık** — `shared` 107, `extension` 286, `backend` 3 |
 | Test dosyası | 28 |
 | Eksik/bozuk ilan | **Teste bağlı** — `extension/test/eksikAlan.test.ts` (tek alan) ve `fixtureEksik.test.ts` (4 elle kurulmuş fixture: eksik, fiyatsız, farklı düzen, arabam eksik) |
 | Tip denetimi | Üç paket de temiz (`pnpm -r exec tsc --noEmit`) |
@@ -72,6 +72,10 @@ Kod tarafında açık madde kalmadı.
 > kaydedilemezse düğme "Doğrulanıyor…"da kilitleniyordu; silme hatası sessizce
 > yutuluyordu; Google'ın 5xx arızası "anahtar geçerli değil" diye gösterilip
 > kullanıcıya sağlam anahtarını attırıyordu.
+
+> Gemini isteğinin süresi yoktu: asılı kalan bir yanıt paneli sonsuza dek "Analiz
+> ediliyor…"da bırakıyordu. Artık 60 sn sonra iptal ediliyor (gövde okuması dahil),
+> panel "Google bir dakika içinde cevap vermedi" diyor ve analiz ikinci kez denemiyor.
 
 > Stil sızıntısı bu listede **yok**: panel `attachShadow` ile Shadow DOM içine
 > kuruluyor, sitenin CSS'i panele geçemiyor. Bakıldı, risk yok.

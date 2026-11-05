@@ -16,6 +16,7 @@ const HATA_METNI: Record<string, string> = {
   anahtarYok: 'Analiz için kendi Gemini API anahtarını girmen gerekiyor — ücretsiz.',
   anahtarSorunu: 'Anahtarın kabul edilmedi. Google AI Studio’da geçerli ve kotasının dolmamış olduğunu kontrol et.',
   hizLimiti: 'Google anahtarın hız sınırına takıldı, biraz sonra tekrar dene.',
+  zamanAsimi: 'Google bir dakika içinde cevap vermedi, tekrar dene.',
   ag: 'Google’a ulaşılamadı.', ai: 'Analiz üretilemedi.'
 }
 

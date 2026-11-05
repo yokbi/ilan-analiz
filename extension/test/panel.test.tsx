@@ -182,11 +182,16 @@ describe('anahtar kurulum çağrısı', () => {
 
   // Geçici hatalarda kurulum ekranı GÖSTERİLMEMELİ: anahtar zaten doğru, sorun geçici.
   it('geçici hatalarda normal "tekrar dene" akışı korunur', () => {
-    for (const kod of ['ag', 'ai', 'hizLimiti']) {
+    for (const kod of ['ag', 'ai', 'hizLimiti', 'zamanAsimi']) {
       const k = cizdir({ asama: 'hata', mesaj: kod, tekrar: () => {} })
       expect(k.querySelector('[data-rol="tekrar"]'), kod).not.toBe(null)
       expect(k.querySelector('[data-rol="anahtar-ac"]'), kod).toBe(null)
     }
+  })
+
+  it('zaman aşımı ağ hatasından ayrı söylenir', () => {
+    const k = cizdir({ asama: 'hata', mesaj: 'zamanAsimi', tekrar: () => {} })
+    expect(k.textContent).toContain('cevap vermedi')
   })
 
   it('hız limiti beklemeyi söyler, anahtarı suçlamaz', () => {

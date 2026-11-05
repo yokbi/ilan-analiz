@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
-import { geminiClient } from '../src/gemini'
+import { geminiClient, AiZamanAsimiHatasi, GEMINI_ZAMAN_ASIMI_MS } from '../src/gemini'
+import { analyzeListing } from '../src/analiz'
 
 function fakeFetcher(status: number, gövde: unknown): { fetcher: typeof fetch; çağrılar: any[] } {
   const çağrılar: any[] = []
@@ -163,5 +164,53 @@ describe('thinkingConfig merdiveni', () => {
       model: 'm', max_tokens: 100, thinking: { type: 'disabled' }, messages: [{ role: 'user', content: 'x' }]
     })).rejects.toThrow(/gemini HTTP 429/)
     expect(cagrilar.length).toBe(1)
+  })
+})
+
+describe('geminiClient — zaman aşımı', () => {
+  // Sinyali dinleyen ve hiç cevap vermeyen sahte sunucu.
+  const asili = (çağrılar: any[] = []) => ((_url: any, init: any) => {
+    çağrılar.push(init)
+    return new Promise((_, reddet) => {
+      init.signal.addEventListener('abort', () => reddet(new DOMException('aborted', 'AbortError')))
+    })
+  }) as typeof fetch
+
+  it('varsayılan süre bir dakika ve her istek bir iptal sinyali taşır', async () => {
+    expect(GEMINI_ZAMAN_ASIMI_MS).toBe(60_000)
+    const { fetcher, çağrılar } = fakeFetcher(200, OK_GOVDE)
+    await geminiClient({ apiKey: 'k', fetcher }).messages.create({ model: 'm', messages: [] })
+    expect(çağrılar[0].init.signal).toBeInstanceOf(AbortSignal)
+  })
+
+  it('süre dolunca istek iptal edilir ve AiZamanAsimiHatasi fırlar', async () => {
+    const çağrılar: any[] = []
+    const ai = geminiClient({ apiKey: 'k', fetcher: asili(çağrılar), zamanAsimiMs: 20 })
+    await expect(ai.messages.create({ model: 'm', messages: [] })).rejects.toBeInstanceOf(AiZamanAsimiHatasi)
+    expect(çağrılar[0].signal.aborted).toBe(true)
+  })
+
+  it('gövdesi akmayan yanıt da süreye takılır', async () => {
+    const fetcher = ((_u: any, init: any) => Promise.resolve({
+      ok: true, status: 200,
+      text: () => new Promise((_, reddet) =>
+        init.signal.addEventListener('abort', () => reddet(new DOMException('aborted', 'AbortError'))))
+    })) as unknown as typeof fetch
+    const ai = geminiClient({ apiKey: 'k', fetcher, zamanAsimiMs: 20 })
+    await expect(ai.messages.create({ model: 'm', messages: [] })).rejects.toBeInstanceOf(AiZamanAsimiHatasi)
+  })
+
+  it('süreden önce gelen ağ hatası zaman aşımı sayılmaz', async () => {
+    const fetcher = (async () => { throw new TypeError('Failed to fetch') }) as typeof fetch
+    const ai = geminiClient({ apiKey: 'k', fetcher, zamanAsimiMs: 1000 })
+    await expect(ai.messages.create({ model: 'm', messages: [] })).rejects.toBeInstanceOf(TypeError)
+  })
+
+  it('analiz zaman aşımında ikinci kez denemez', async () => {
+    const çağrılar: any[] = []
+    const ai = geminiClient({ apiKey: 'k', fetcher: asili(çağrılar), zamanAsimiMs: 20 })
+    const ilan: any = { baslik: 'x', aciklamaText: null, ekAlanlar: {}, fiyat: null }
+    await expect(analyzeListing(ai, 'm', ilan, null, null, null, null)).rejects.toBeInstanceOf(AiZamanAsimiHatasi)
+    expect(çağrılar).toHaveLength(1)
   })
 })
