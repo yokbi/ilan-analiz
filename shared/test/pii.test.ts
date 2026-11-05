@@ -18,7 +18,7 @@ describe('telefon', () => {
       '1.6 TDI 190 HP', '150.000 km', '2015 model 145.000 km', '1.550.000 TL',
       '2015 150.000', '50.000 90.000', '450.000 500.000 arası',
       '4x4 16 inç jant', '205 55 R16', '1598 cc', '2.0 TDI 170 bg',
-      '05.12.2019 tarihinde', '12.03.2019 - 15.04.2020', 'Şasi WVWZZZ1KZAW123456',
+      '05.12.2019 tarihinde', '12.03.2019 - 15.04.2020',
       'bir milyon dört yüz elli bin TL'
     ]) expect(maskeleMetin(t), t).toBe(t)
   })
@@ -89,6 +89,23 @@ describe('plaka', () => {
   it('YANLIŞ POZİTİF: 81 üstü il kodu yok, uzun sayının içi kırpılmaz', () => {
     expect(maskeleMetin('99 ABC 12')).toBe('99 ABC 12')
     expect(maskeleMetin('2020 CLA 45')).toBe('2020 CLA 45')
+  })
+})
+
+describe('şasi (VIN)', () => {
+  it('maskeler — büyük, küçük harfli ve etiketli yazım', () => {
+    expect(maskeleMetin('Şasi WVWZZZ1KZAW123456')).toBe('Şasi [şasi]')
+    expect(maskeleMetin('şasi no: vf1rfb00x56123456, ekspertiz ekte')).toBe('şasi no: [şasi], ekspertiz ekte')
+    expect(maskeleMetin('VIN:NMTBZ28E70R123456')).toBe('VIN:[şasi]')
+  })
+  it('telefon maskesi şasinin içindeki rakamları kırpmaz', () => {
+    expect(maskeleMetin('WVWZZZ05321234567 sorunsuz')).toBe('[şasi] sorunsuz')
+  })
+  it('YANLIŞ POZİTİF: I/O/Q içeren, düz sayı, düz kelime ve 17 dışı uzunluk eşleşmez', () => {
+    for (const t of [
+      'WVWZZZ1KZAW12345O', '12345678901234567', 'ABCDEFGHJKLMNPRST', 'WVWZZZ1KZAW1234567',
+      'WVWZZZ1KZAW12345', 'Otomatikvitesliaraç'
+    ]) expect(maskeleMetin(t), t).toBe(t)
   })
 })
 

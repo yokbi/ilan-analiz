@@ -1,5 +1,5 @@
 // Açıklama metni Gemini'ye — yani yurt dışına — gidiyor. İlan kamuya açık olsa da
-// içindeki telefon/e-posta/IBAN/TCKN kişisel veridir; KVKK'da yurt dışı aktarımın
+// içindeki telefon/e-posta/IBAN/TCKN/plaka/şasi kişisel veridir; KVKK'da yurt dışı aktarımın
 // ekseni tam olarak bu alanlar.
 //
 // SİLMİYORUZ, MASKELİYORUZ. "[telefon] [telefon] [iban]" satıcı hakkında hiçbir şey
@@ -13,7 +13,7 @@
 // kendi cihazındaki 24 saatlik sonuç önbelleği.
 
 export const PII_YER = {
-  tel: '[telefon]', eposta: '[e-posta]', plaka: '[plaka]', tckn: '[tckn]', iban: '[iban]'
+  tel: '[telefon]', eposta: '[e-posta]', plaka: '[plaka]', tckn: '[tckn]', iban: '[iban]', sasi: '[şasi]'
 } as const
 
 // TR + 24 hane, 4'erli boşluklu yazım dahil. Yanlış pozitif yok: araç ilanında
@@ -24,6 +24,18 @@ const IBAN = /\bTR\s?\d{2}(?:\s?\d{4}){5}\s?\d{2}\b/gi
 // Kapsam dışı: "@instagram_kullanici" — alan adı olmadığı için eşleşmez, bilinçli
 // (işletme hesabı adı kişisel veri ekseninde farklı bir tartışma).
 const EPOSTA = /[A-Za-z0-9._%+-]+\s?@\s?[A-Za-z0-9.-]+\.[A-Za-z]{2,}/g
+
+// Şasi numarası (VIN): plakayla aynı sınıf — aracı, tescil kaydı üzerinden de sahibini
+// tanımlar; plaka maskelenip şasi açık kalırsa maske delik olurdu. 17 karakter, I/O/Q
+// hiç geçmez (ISO 3779). Kontrol basamağı (9. hane) yalnız Kuzey Amerika'da zorunlu,
+// Avrupa şasilerinde rastgele; bu yüzden doğrulanamıyor. Yanlış pozitif kalkanı:
+// en az iki harf ve en az iki rakam şart — 17 haneli düz sayı ya da düz kelime şasi
+// değildir. Küçük harfli yazım da yakalanır (şasi kopyalanırken küçülebiliyor).
+const SASI = /(?<![A-Za-z0-9])[A-HJ-NPR-Za-hj-npr-z0-9]{17}(?![A-Za-z0-9])/g
+
+function sasiMi(s: string): boolean {
+  return (s.match(/\d/g)?.length ?? 0) >= 2 && (s.match(/[A-Za-z]/g)?.length ?? 0) >= 2
+}
 
 // TCKN: 11 hane. Ayıraçlı sayı ("1.550.000") BİTİŞİK 11 hane üretmediği için
 // fiyat/km buraya hiç girmez. Girse bile doğrulama basamakları eliyor: rastgele
@@ -116,6 +128,7 @@ export function maskeleMetin(s: string): string {
   return s
     .replace(IBAN, PII_YER.iban)
     .replace(EPOSTA, PII_YER.eposta)
+    .replace(SASI, m => (sasiMi(m) ? PII_YER.sasi : m))
     .replace(TCKN, m => (tcknMu(m) ? PII_YER.tckn : m))
     .replace(PLAKA, (m, _il, harf: string, rakam: string) =>
       GECERLI_KOMBO[harf.length]?.includes(rakam.length) && !ROZET.has(harf.toUpperCase())

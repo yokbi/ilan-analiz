@@ -15,7 +15,7 @@ dosyalarındadır; burada yalnız **kalan iş** durur.
 
 | | |
 |---|---|
-| Test | **387 geçiyor / 0 kırık** — `shared` 99, `extension` 285, `backend` 3 |
+| Test | **390 geçiyor / 0 kırık** — `shared` 102, `extension` 285, `backend` 3 |
 | Test dosyası | 28 |
 | Eksik/bozuk ilan | **Teste bağlı** — `extension/test/eksikAlan.test.ts` (tek alan) ve `fixtureEksik.test.ts` (4 elle kurulmuş fixture: eksik, fiyatsız, farklı düzen, arabam eksik) |
 | Tip denetimi | Üç paket de temiz (`pnpm -r exec tsc --noEmit`) |
@@ -146,7 +146,7 @@ gerçek bir Firefox'ta açılmadı.**
 ### 2.5 Hukuk · öncelik: yayından önce zorunlu
 
 - [ ] PII maskelemenin KVKK açısından yeterliliği. `shared/src/pii.ts` telefon,
-      e-posta, IBAN, TC kimlik ve plaka maskeliyor ve testi var — ama bunun
+      e-posta, IBAN, TC kimlik, plaka ve şasi maskeliyor ve testi var — ama bunun
       **yeterli olup olmadığı** teknik değil hukuki bir değerlendirme.
 - [ ] Gizlilik politikası metninin kendisi.
 - [ ] Üzerinde çalışılan sitelerin kullanım şartlarına uygunluk değerlendirmesi.

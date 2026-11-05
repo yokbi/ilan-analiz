@@ -85,7 +85,7 @@ tarayıcınızdan Google Gemini API'ye gönderilir. Bu aktarım sizinle Google a
 biz aracı değiliz ve içeriği görmeyiz. Google'ın bu veriyi nasıl işlediği kendi
 koşullarına tabidir.</p>
 <p>Gönderilmeden önce metindeki <strong>telefon numarası, e-posta adresi, IBAN, T.C.
-kimlik numarası ve plaka</strong> otomatik olarak maskelenir (yerine <code>[telefon]</code>
+kimlik numarası, plaka ve şasi numarası</strong> otomatik olarak maskelenir (yerine <code>[telefon]</code>
 gibi bir işaret konur). Bu, ilan sahibinin kişisel verisini korumak içindir.</p>
 
 <h2>Ödeme</h2>

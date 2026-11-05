@@ -90,7 +90,7 @@ Chrome'daki kadar güvenilir taklit edilemez.
 ## 6. Hukuk ve politika
 
 - **PII maskeleme yeterli mi?** `shared/src/pii.ts` telefon, e-posta, IBAN, TC
-  kimlik ve plaka maskeliyor ve bunun testi var. Ama bu maskelemenin **KVKK
+  kimlik, plaka ve şasi maskeliyor ve bunun testi var. Ama bu maskelemenin **KVKK
   açısından yeterli olup olmadığı** hukuki bir değerlendirme. İlan metnini yazan
   kişi verisinin bir üçüncü tarafa (Google) gitmesi söz konusu; bu, teknik değil
   hukuki bir sorudur.
