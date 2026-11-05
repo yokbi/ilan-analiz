@@ -107,6 +107,18 @@ describe('analiz tamamen tarayıcıda', () => {
       vi.useRealTimers()
     }
 
+    // Hiç cevap vermeyen Google: bir dakika sonra 'zamanAsimi', panel sonsuza dek beklemez.
+    vi.useFakeTimers()
+    try {
+      const asili = ((_u: any, init: any) => new Promise((_, reddet) =>
+        init.signal.addEventListener('abort', () => reddet(new Error('aborted'))))) as any
+      const sonuc = handleMesaj(istek(), asili)
+      await vi.advanceTimersByTimeAsync(60_000)
+      expect(await sonuc).toEqual({ ok: false, hata: 'zamanAsimi' })
+    } finally {
+      vi.useRealTimers()
+    }
+
     // JSON hiç ayrıştırılamazsa analiz üretilemedi
     expect(await handleMesaj(istek(), ile('bu json değil'))).toEqual({ ok: false, hata: 'ai' })
   })

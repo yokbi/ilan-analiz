@@ -2,6 +2,7 @@ import {
   AiAnalysisSchema, type ListingDetail, type ModelProfile, type AiAnalysis,
   type FiyatIstatistik, type KmDurum
 } from './schemas'
+import { AiZamanAsimiHatasi } from './gemini'
 import { ilanYasiGun, ilanYasiMetni, tarihAlanlariniAyikla } from './ilanTarihi'
 
 // Analiz hattı SUNUCUDAN BAĞIMSIZ: aynı kod hem backend'de hem uzantıda çalışıyor.
@@ -265,6 +266,9 @@ export async function analyzeListing(
       return AiAnalysisSchema.parse(extractJson(sonMetin(resp)))
     } catch (e: any) {
       if (krediHatasiMi(e)) throw new AiKrediHatasi('sağlayıcı kredi/kimlik hatası', e)
+      // Zaman aşımında ikinci deneme kullanıcıyı bir dakika daha bekletirdi; panel
+      // "tekrar dene" düğmesini zaten veriyor, karar onun.
+      if (e instanceof AiZamanAsimiHatasi) throw e
       sonHata = e
       console.log('[ANALIZ HATA]', deneme, String(e?.message ?? e).slice(0, 600))
       if (hizLimitiMi(e) && deneme === 0) await bekle(4000)

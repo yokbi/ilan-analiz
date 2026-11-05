@@ -1,7 +1,7 @@
 import {
   AnalysisResultSchema, geminiClient, analyzeListing, maskeleIlan,
   fiyatIstatistik, pazarlikTabani, clampPazarlik, kmDurumu, listeSkoru,
-  AiKrediHatasi, AiHizLimitiHatasi
+  AiKrediHatasi, AiHizLimitiHatasi, AiZamanAsimiHatasi
 } from 'shared'
 import type { IstekMesaj, CevapMesaj } from './mesaj'
 import { anahtarGetir, VARSAYILAN_MODEL } from './anahtar'
@@ -64,6 +64,7 @@ export async function handleMesaj(
     // kullanıcıyı ne yapacağını bilmez hâlde bırakır.
     if (e instanceof AiKrediHatasi) return { ok: false, hata: 'anahtarSorunu' }
     if (e instanceof AiHizLimitiHatasi) return { ok: false, hata: 'hizLimiti' }
+    if (e instanceof AiZamanAsimiHatasi) return { ok: false, hata: 'zamanAsimi' }
     return { ok: false, hata: 'ag' }
   }
 }
