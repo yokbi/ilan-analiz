@@ -23,8 +23,8 @@ Tek cümlelik hâli: **ilan metni yalnız sizin anahtarınızla Google'a gider, 
 | Ürettiğiniz analizler | Yalnız tarayıcınız, 24 saat | Aynı ilanı tekrar açınca size ücret çıkmasın diye |
 | Kullanım istatistiği, çerez, hesap | **Yok** | Toplanmıyor |
 
-Google'a gitmeden önce metindeki telefon, e-posta, IBAN, T.C. kimlik numarası ve plaka
-maskelenir (`shared/src/pii.ts`). Bu, ilanı yazan kişinin verisini korumak içindir.
+Google'a gitmeden önce metindeki telefon, e-posta, IBAN, T.C. kimlik numarası, plaka ve
+şasi numarası maskelenir (`shared/src/pii.ts`). Bu, ilanı yazan kişinin verisini korumak içindir.
 
 **Bu depoda bir `backend/` klasörü var** — dürüst olmak gerekirse tam olarak "sunucusuz"
 değiliz. O sunucunun tek işi statik bir gizlilik politikası sayfası sunmak (mağaza

@@ -34,7 +34,7 @@ export async function handleMesaj(
   if (!anahtar) return { ok: false, hata: 'anahtarYok' }
 
   const { ilan, benzerFiyatlar } = msg.istek
-  // Maske çağrıdan ÖNCE: telefon/IBAN/TCKN/plaka Google'a gitmesin. Sunucu yokken de
+  // Maske çağrıdan ÖNCE: telefon/IBAN/TCKN/plaka/şasi Google'a gitmesin. Sunucu yokken de
   // vazgeçilmez — ilan sahibinin kişisel verisi ilanı okuyan kullanıcının değil.
   maskeleIlan(ilan)
 

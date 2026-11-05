@@ -41,7 +41,7 @@ Used only for chrome.storage.local, on the user's device: (1) the user's own Goo
 ```text
 https://www.sahibinden.com/* and https://www.arabam.com/* — the content script reads the listing or search result page the user has opened and draws the panel and score badges on it. The extension never requests pages from these sites on its own: no background fetching, crawling or scheduled requests. These are the only sites the content script runs on.
 
-https://generativelanguage.googleapis.com/* — the Google Gemini API. When the user opens a listing, the service worker sends that listing's text to Gemini with the user's own API key and shows the answer in the panel. The popup also calls this host once to verify a newly entered key. Phone numbers, e-mail addresses, IBANs, national ID numbers and licence plates are masked before sending. The request goes directly from the user's browser to Google; it does not pass through any developer server.
+https://generativelanguage.googleapis.com/* — the Google Gemini API. When the user opens a listing, the service worker sends that listing's text to Gemini with the user's own API key and shows the answer in the panel. The popup also calls this host once to verify a newly entered key. Phone numbers, e-mail addresses, IBANs, national ID numbers, licence plates and vehicle identification numbers (VIN) are masked before sending. The request goes directly from the user's browser to Google; it does not pass through any developer server.
 ```
 
 ## Remote code
