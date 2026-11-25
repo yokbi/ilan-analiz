@@ -97,9 +97,8 @@ Kod tarafında açık madde kalmadı.
 
 ### 1.5 CI maliyeti · öncelik: düşük
 
-- [ ] CI her `push`ta koşuyor. Actions dakikası fazla geliyorsa `on:` bloğundan
-      `push` çıkarılıp yalnız `pull_request` bırakılabilir. Bu bir **karar**,
-      teknik bir eksik değil.
+- [x] CI yalnız `pull_request` ve `main` push'unda koşuyor (`on: push: branches: [main]`,
+      2026-09-09'dan beri; 2026-11-25'te doğrulandı). Özellik dallarına her push'ta koşmuyor.
 
 ---
 

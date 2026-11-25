@@ -20,7 +20,7 @@ pnpm install --frozen-lockfile && pnpm -r test && pnpm -r exec tsc --noEmit
 ```
 
 ## Sıradaki kod işi (🤖)
-1. [ ] **CI maliyeti** (1.5) — `ci.yml`'yi `pull_request` + `main` push'una daralt (her push'ta koşmasın).
+1. [x] **CI maliyeti** (1.5) — `ci.yml` zaten yalnız `pull_request` + `main` push'unda koşuyor (2026-09-09'dan beri; 2026-11-25'te doğrulandı).
 2. [ ] **Üçüncü site adaptörü** (1.4, isteğe bağlı, ~130 satır) — önce kullanıcıdan hangi site olduğunu sor.
 3. [ ] 👤 2.2'den gerçek eksik ilan HTML'i gelirse fixture olarak ekle (1.1).
 
@@ -31,4 +31,5 @@ pnpm install --frozen-lockfile && pnpm -r test && pnpm -r exec tsc --noEmit
 4. 2.4 Mağaza hesapları (Chrome 5 USD, AMO), gizlilik sayfası yayını · 2.5 KVKK / site kullanım şartları değerlendirmesi.
 
 ## Son oturumlar
+- 2026-11-25 — Belge denetimi: CI maddesi zaten yapılmıştı, kapatıldı; 396 test yeşil.
 - 2026-11-07 — PROGRESS.md oluşturuldu; 396 test yeşil (kod değişikliği yok).
